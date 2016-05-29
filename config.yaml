@@ -1,0 +1,16 @@
+---
+baseUrl: "http://jmazz.me"
+title: "jmazz' blogomatics"
+footnotereturnlinkcontents: "↩"
+permalinks:
+  post: /:year/:month/:title/
+googleAnalytics: "XXX-XXX"
+pygmentsStyle: "monokai"
+blackfriday:
+  fractions: false
+params:
+  Subtitle: "Spinning the cogs in the widgets"
+  AuthorName: "Julian Mazzitelli"
+  GitHubUser: "thejmazz"
+  SidebarRecentLimit: 5
+---

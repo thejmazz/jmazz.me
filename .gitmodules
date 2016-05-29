@@ -1,0 +1,3 @@
+[submodule "themes/allegiant"]
+	path = themes/allegiant
+	url = https://github.com/brycematheson/allegiant
