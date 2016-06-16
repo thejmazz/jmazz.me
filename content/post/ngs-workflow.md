@@ -128,14 +128,14 @@ For each tool, we will inspect the following topics.
 ### Metrics
 
 - time for each task
+- resource usage
 - reports
 
 ### Scaling
 
 - extend to many species
 - run on a cluster/cloud system
-- distribute
-- reproducibility
+- distribute/reproducibility
 
 ## bash
 
@@ -223,11 +223,34 @@ throughout the script. As well, I particulary enjoy [this][r-exec-atom] plugin, 
 
 ### Metrics
 
-- has to be handled manually - clutters code, prone to error
+Any metrics you might want - time per task, cpu time per task, cpu and memory usage, would all have to be written manually. You could write a function to wrap commands and time them, etc, but this still clutters the code, obstructing the main message. Furthermore, "in house" metrics gathering is prone to error, especially when running on different machines. You may want to develop on a Mac and then deploy to a Linux server, where some commands may be different.
+
+Any sort of report on the pipeline performance, whether it be a text file or styled HTML document, would again require in house coding.
 
 ### Scaling
 
-- nah
+Bash scripts are not scalable. If we were to port the script to handle multiple species, we *could use* bash arrays:
+
+```bash
+nums=(1 2 3 4 5); for i in $nums; do echo $i; done
+```
+
+The above script might work for pipelines which only take one input parameter for a specie, but we also need the reference URL, SRA ID, etc. Going one step further, we can use array indices to gather related data. Yet the syntax is not the cleanest:
+
+```bash
+species=(Salmonella-enterica Staphylococcus-aureus)
+readsID=(2492428 1274026)
+
+for i in "${!species[@]}"; do 
+    printf "%s\t%s\t%s\n" $i ${species[$i]} ${readsID[$i]}
+done
+```
+
+However, this would probably involve multiple code changes throughout the script. When deviating from the original purpose, bash scripts are likely to require relatively large codebase fixes. Changing species from a string to an array will break a lot of things.
+
+Furthermore, changing settings like maximum threads and memory usage will require manually editing the script when on the cluster, versus other tools which can provide this a command line option. Of course, *you could parse your own params*, but that is a lot of manual work.
+
+In terms of reproducibility, there is not much. The script will likely assume all dependencies are installed. It may assume required binaries are in a specific place (in my script I used the `BIN` variable for this). It may also even fail on systems with different commands. It may also even assume being in a certain directory and directory structures of the system. 
 
 ## make
 
@@ -290,26 +313,11 @@ reads.sam: bwa-index.log ${PRECONDITION_TO_USE}
 	echo "Target $@ took $$runtime seconds"
 ```
 
+- can potentially be improved with call function, etc
+
 ### Iterative Development
 
-Iterative development in `make` is much improved over a `bash` script. This is because you can call a specific rule at invocation: `make reads.sam` for example. As well, it is common practice to include a clean rule. It is possible in `make` to define targets that don't actually create the target file. Consider
-
-```bash
-rule all: protein
-
-rule dna: 
-	echo ATCG > $@
-
-rule rna: dna
-	cat $< | sed s/G/U/g > rna_not_target
-
-rule protein: rna
-	./rna_to_protein $< -o $@
-```
-
-TODO fix example.
-
-Since the target is not actually created (even though the command in that rule has ran and worked as expected), since make skips rules if the target already exists, it will unnecessarily rerun the rule. My general workflow writing a `make` pipeline was to update the prequisite of `rule all` as new rules were added, and each task from before would be skipped. One way to get around this issue is to create "flag files":
+Iterative development in `make` is much improved over a `bash` script. This is because you can call a specific rule at invocation: `make reads.sam` for example. As well, it is common practice to include a clean rule. It is possible in `make` to define targets that don't actually create the target file. Since the target is not actually created (even though the command in that rule has ran and worked as expected), since make skips rules if the target already exists, it will unnecessarily rerun the rule. My general workflow writing a `make` pipeline was to update the prequisite of `rule all` as new rules were added, and each task from before would be skipped. One way to get around this issue is to create "flag files":
 
 ```bash
 trim.happened: fastq-dump.log
@@ -349,7 +357,7 @@ TODO use make wildcarding.
 
 ### Scaling
 
-- nah
+Scaling with make is also difficult. There is no easy way to expand the pipeline to multiple species, and it is difficulty to "variabilize" outputs: targets need to strings.
 
 ## snakemake
 
@@ -381,32 +389,16 @@ species = {
 THREADS=2
 TEMP='./tmp'
 
-FINAL_FILES = []
-# Need to create some flag files so that rules for downloading data that do
-# not need an input, can have one so that they can be wildcarded.
-# As well, create the FINAL_FILES list.
-def init():
-    for specie in species:
-        FINAL_FILES.append(specie + '.vcf')
-
-        # TODO check if file already exists, if it does, don't make a new one
-        # with newer date, as that will restart the pipeline.
-        with open(specie + '.flag', 'w') as specieFlag:
-            specieFlag.write('')
-
-init()
+FINAL_FILES = [specie+'.vcf' for specie in species]
 ```
 
-TODO may need to fix this^
-
-This will end up with `FINAL_FILES` being `['Salmonella-enterica.vcf']`. We also generate some "flag" files. This is to make use of Snakemake's wildcarding feature. See this rule which will be one of the first in the executed pipeline (here I hardcode to specie name to better illustrate):
+This will end up with `FINAL_FILES` being `['Salmonella-enterica.vcf']`.  See this rule which will be one of the first in the executed pipeline (here I hardcoded the specie name to better illustrate):
 
 ```python
 rule all:
     input: 'Salmonella-enterica.vcf'
 
 rule download_sra:
-    input: '{specie}.flag'
     output: '{specie}.sra'
     run:
         readsID = species[wildcards.specie]['readsID']
@@ -421,11 +413,35 @@ rule call:
     shell: 'magic {input} > {output}'
 ```
 
- TODO fix snakemake
-
 The first rule will be triggered and will be looking for another rule that has `Salmonella-enterica.vcf` in its `output`. It won't find *exactly* that, but because of Snakemake's wildcarding, `{specie}.vcf` will do (from `rule call`), and then within the `call` rule, the value of `wildcards.specie` will be `Salmonella-enterica`. Then it will move onto `download_sra`. 
 
-TODO for a more complicated snakemake setup, take a look at [this]
+Another neat feature with Snakemake is the ability to drop in "wrappers":
+
+```python
+rule bwa_mem:
+    input:
+        ref = '{specie}.genomic.fna.gz',
+        sample = ['{specie}_'+num+'.fastq.gz' for num in ['1', '2']],
+        index_files = ['{specie}.genomic.fna.gz.'+suffix for suffix in ['amb', 'ann', 'bwt', 'pac', 'sa']]
+    log: 'logs/bwa_mem/{specie}.log'
+    output: '{specie}.sam'
+    threads: THREADS
+    wrapper: '0.0.8/bio/bwa_mem'
+```
+
+These wrappers come from the [wrappers repository][wrappers-repository]. They run predefined commands using specific input variables. While this is great, there is some overhead in having to check the source to see what is actually happening, and by extension, you then need an internet connection to do so. There does not seem to be a huge list of wrappers, it is too bad it does not seem to have caught on extensively.
+
+Still have the problem of using log/flag files for task dependency, but less so, since you can define "custom" outputs, also has touch(flag) built in
+
+Could not figure out how to ecomical branching, wildcard regexes create ambiguity:
+
+![attempt-branching](https://raw.githubusercontent.com/bionode/gsoc16/fdf22b630e33dd11302ea8822c547ef9399c3ea4/pipelines/with-snakemake/dag.png)
+
+Here it unnecessarily redoes certain steps. This is because `Salmonella-enterica.trim.vcf` and `Salmonella-enterica.trim.vcf` both match `{specie}.vcf`. At first, Snakemake complained about ambiguous rules due to this conflict. I was able to generate the DAG above by using custom regexes for the wildcard in a few rules: `{specie,[a-zA-z-]+}`. However, since this then creates one set of rules with `wildcard.specie = Salmonella-enterica` and another with `wildcard.specie = Salmonella-enterica.trim`, and then that wildcard moves all the way to the first rule, and basically two pipelines are ran. I was not able to figure out how optimize this using Snakemake - if anyone can, let me know!
+
+Moreover - because the **pull** workflow style depends on *targets* and *prerequisites*, it can be difficult to achieve a branch-merge pipeline. We will see with Nextflow, which follows the dataflow paradigm, or **push**, it is natural to describe such pipelines.
+
+For a more complicated (and real world) snakemake setup, take a look at [pachterlab/kallisto_paper_analysis/Snakefile][https://github.com/pachterlab/kallisto_paper_analysis/blob/nbt/Snakefile].
 
 ### Iterative Development
 
@@ -443,7 +459,8 @@ As opposed to `rm *.sra *.bam`.
 
 ### Metrics
 
-- time for each task
+- time for each task, benchmarks
+- benchmark files need to be named appropiately, etc
 - DAG
 
 ### Scaling
@@ -457,6 +474,9 @@ As opposed to `rm *.sra *.bam`.
 Nextflow is a more recent tool, and approaches the workflow problem in a **push** sense. Similar to how Snakemake allows direct Python integration, Nextflow uses Groovy (Some syntax on top of Java). 
 
 ### Basic Structure
+
+- dataflow/**push**
+- dynamic
 
 Nextflow uses **processes** as rules, and each process will occur in its own folder in `/work`. Since each process takes place in its own folder, using output from one task as input in another cannot be done the "conventional way". But that is alright, because Nextflow provides **channels** to communicate between processes. 
 
@@ -571,7 +591,11 @@ You might have noticed the `container` [directive] in the above processes. Nextf
 
 - luigi
 - airbnb
+- toil
+- bcbio
+- gulp - https://github.com/pachterlab/kallisto/blob/master/gulpfile.js
 - awesome-pipeline
+- scipipe
 - reread workflows paper
 - reread Wonjune's report
 
@@ -667,14 +691,10 @@ We have looked at z, y, z. We have discovered x, y, z. To investigate is x, y, z
 [wiki/SAMtools]: https://en.wikipedia.org/wiki/SAMtools
 [pileup]: https://en.wikipedia.org/wiki/Pileup_format
 [vcf]: https://en.wikipedia.org/wiki/Variant_Call_Format
-[atom-r-exec]: 
-
-[make-gist]:
-
-[nextflow-processes]:
-
-[nextflow-channels]:
-
-[nextflow-groovy]:
-
-[nextflow-directive]:
+[atom-r-exec]: https://atom.io/packages/r-exec
+[make-gist]: https://gist.github.com/isaacs/62a2d1825d04437c6f08
+[nextflow-processes]: http://www.nextflow.io/docs/latest/process.html
+[nextflow-channels]: http://www.nextflow.io/docs/latest/channel.html
+[nextflow-groovy]: http://www.nextflow.io/docs/latest/script.html
+[nextflow-directive]: http://www.nextflow.io/docs/latest/process.html#directives
+[wrappers-repository]: https://bitbucket.org/snakemake/snakemake-wrappers
