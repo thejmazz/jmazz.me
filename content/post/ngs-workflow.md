@@ -139,7 +139,7 @@ For each tool, we will inspect the following topics.
 
 ## bash
 
-The first obvious tool to use constructing a pipeline composed of a list of shell commands is a simple bash script. Essentially, we can take the commands from above and arrange them in a linear manner. You can see the full bash pipeline here: [basic-snp-calling.sh]. 
+The first obvious tool to use constructing a pipeline composed of a list of shell commands is a simple bash script. Essentially, we can take the commands from above and arrange them in a linear manner. You can see the full bash pipeline here: [basic-snp-calling.sh](https://github.com/bionode/gsoc16/blob/543ba66cbb42d1622089764bf01090e318307a57/pipelines/with-bash/basic-snp-calling.sh). 
 
 ### Basic Structure
 
@@ -254,7 +254,7 @@ In terms of reproducibility, there is not much. The script will likely assume al
 
 ## make
 
-`make` and `Makefile` are old, well known tools that are normally used for C/C++ compilation.
+`make` and `Makefile` are old, well known tools that are normally used for C/C++ compilation. The complete `Makefile` is [here](https://github.com/bionode/gsoc16/blob/543ba66cbb42d1622089764bf01090e318307a57/pipelines/with-make/Makefile). 
 
 ### Basic Structure
 
@@ -313,8 +313,6 @@ reads.sam: bwa-index.log ${PRECONDITION_TO_USE}
 	echo "Target $@ took $$runtime seconds"
 ```
 
-- can potentially be improved with call function, etc
-
 ### Iterative Development
 
 Iterative development in `make` is much improved over a `bash` script. This is because you can call a specific rule at invocation: `make reads.sam` for example. As well, it is common practice to include a clean rule. It is possible in `make` to define targets that don't actually create the target file. Since the target is not actually created (even though the command in that rule has ran and worked as expected), since make skips rules if the target already exists, it will unnecessarily rerun the rule. My general workflow writing a `make` pipeline was to update the prequisite of `rule all` as new rules were added, and each task from before would be skipped. One way to get around this issue is to create "flag files":
@@ -363,7 +361,7 @@ Scaling with make is also difficult. There is no easy way to expand the pipeline
 
 The `Makefile` was much more organized than the bash script, but still of "a low level".
 
-Snakemake was a refreshing take on the make style, but with many more features and powered by a high level language. Including Python integration everywhere, tasks to script in Python, Bash, and R, and some metrics out of the box. As well as some neat wildcarding.
+Snakemake was a refreshing take on the make style, but with many more features and powered by a high level language. Including Python integration everywhere, tasks to script in Python, Bash, and R, and some metrics out of the box. As well as some neat wildcarding. The complete Snakefile is [here](https://github.com/bionode/gsoc16/blob/543ba66cbb42d1622089764bf01090e318307a57/pipelines/with-snakemake/Snakefile).
 
 ### Basic Structure
 
@@ -413,7 +411,7 @@ rule call:
     shell: 'magic {input} > {output}'
 ```
 
-The first rule will be triggered and will be looking for another rule that has `Salmonella-enterica.vcf` in its `output`. It won't find *exactly* that, but because of Snakemake's wildcarding, `{specie}.vcf` will do (from `rule call`), and then within the `call` rule, the value of `wildcards.specie` will be `Salmonella-enterica`. Then it will move onto `download_sra`. 
+The first rule will be triggered and will be looking for another rule that has `Salmonella-enterica.vcf` in its `output`. It won't find *exactly* that, but because of Snakemake's wildcarding, `{specie}.vcf` will do (from `rule call`), and then within the `call` rule, the value of `wildcards.specie` will be `Salmonella-enterica`. Then it will move onto `download_sra`. This example also illustrates how you can use `run` and `shell()` to mix Python and shell code. You can also use `script` to run a Python or R script, and use the `R()` function to execute R code in a rule.
 
 Another neat feature with Snakemake is the ability to drop in "wrappers":
 
@@ -459,24 +457,91 @@ As opposed to `rm *.sra *.bam`.
 
 ### Metrics
 
-- time for each task, benchmarks
-- benchmark files need to be named appropiately, etc
-- DAG
+You can opt in to store rule benchmarks and logs:
+
+```python
+rule call:
+    input:
+        bam = '{specie}.bam',
+        alignment_index = '{specie}.bam.bai',
+        reference = '{specie}.genomic.fna'
+    output: '{specie}.vcf'
+    log: 'logs/call/{specie}.log'
+    benchmark: 'benchmarks/call/{specie}.txt'
+    shell: 'samtools mpileup -uf {input.reference} {input.bam} | bcftools call -c - > {output}'
+```
+
+However, you will need to make sure you name these files appropiately to avoid overwriting. An example benchmark file looks like:
+
+```
+s	h:m:s
+30.32477617263794	0:00:30.324776
+```
+
+There is no indication of which task the benchmark is for, meaning if you want a comprehensive report of your pipeline you will need to write a script that concatenates the benchmarks in the correct order.
+
+With graphviz installed, snakemake can create a plot of the DAG for your pipeline:
+
+```bash
+snakemake --dag | dot -Tpng > dag.png
+```
+
+You can see an example of this above.
 
 ### Scaling
 
-- need to keep track of filenames
-- was able to add another specie simply
-- clustering is done by specifying available cores, and then "manually" in commands
+With Snakemake it is easy to scale to multiple species. In my Snakefile, I simply just add more keys to the `species` dictionary. Since each output file is prefixed by the species name, there will be no file overlaps. You need to be vigilant with output names and ensure yourself there will be no conflicts.
+
+You can specify clustering configuration by writing a `cluster.config` file and using its values in the call to Snakemake. The example [from the documentation](https://bitbucket.org/snakemake/snakemake/wiki/Documentation#markdown-header-cluster-configuration):
+
+*Snakefile*
+
+```python
+rule all:
+    input: "input1.txt", "input2.txt"
+
+rule compute1:
+    output: "input1.txt"
+    shell: "touch input1.txt"
+
+rule compute2:
+    output: "input2.txt"
+    shell: "touch input2.txt"
+```
+
+*cluster.json*
+
+```json
+{
+    "__default__" :
+    {
+        "account" : "my account",
+        "time" : "00:15:00",
+        "n" : 1,
+        "partition" : "core"
+    },
+    "compute1" :
+    {
+        "time" : "00:20:00"
+    }
+}
+```
+
+And the call to Snakemake:
+
+```
+snakemake -j 999 --cluster-config cluster.json --cluster "sbatch -A {cluster.account} -p {cluster.partition} -n {cluster.n}  -t {cluster.time}"
+```
+
+While nextflow is providing a simple config based way to pass params into your clustering command, the actual command: `sbatch` is written manually. We will say with Nextflow, even this aspect of clustering is abstracted away (into "executor"). See also [job properties](https://bitbucket.org/snakemake/snakemake/wiki/Documentation#markdown-header-job-properties) to see how to write a generic job wrapper for clustering.
 
 ## nextflow
 
-Nextflow is a more recent tool, and approaches the workflow problem in a **push** sense. Similar to how Snakemake allows direct Python integration, Nextflow uses Groovy (Some syntax on top of Java). 
+Nextflow is a more recent tool, and approaches the workflow problem in a **push** sense. Similar to how Snakemake allows direct Python integration, Nextflow uses [Groovy](http://www.groovy-lang.org/). While Snakemake let you write rules with inline Python, R, and shell, in Nextflow, you *can use any scripting language*. See [main.nf](https://github.com/bionode/gsoc16/blob/543ba66cbb42d1622089764bf01090e318307a57/pipelines/with-nextflow/main.nf) for the complete pipeline.
+
+Nextflow follows the [dataflow programming paradigm](https://en.wikipedia.org/wiki/Dataflow_programming) (push) which is also called [stream processing](https://en.wikipedia.org/wiki/Stream_processing) or [reactive programming](https://en.wikipedia.org/wiki/Reactive_programming). While in Snakemake you define `rule all`'s prerequisites, and then "work backwards" from there (pull), in the dataflow model you can think and write in the order that tasks will happen. Since the push model does not depend on inferring a complete dependency tree at the initialization, you can introduce dynamic structures into the pipeline. For example, choosing between two tasks to run *based on the output* of a previous task. One fallback with the push model is that since it can be dynamic, it is difficult to then perform a "dry run", or generate a DAG ahead of time.
 
 ### Basic Structure
-
-- dataflow/**push**
-- dynamic
 
 Nextflow uses **processes** as rules, and each process will occur in its own folder in `/work`. Since each process takes place in its own folder, using output from one task as input in another cannot be done the "conventional way". But that is alright, because Nextflow provides **channels** to communicate between processes. 
 
@@ -577,15 +642,21 @@ Finally, wherease Snakemake only allowed Python and R inside rules, with Nextflo
 
 Iterative developmen with Nextflow is much improved over the other tools. I felt as though I could extend the pipeline, adding new processes, without having to worry about updating a `rule all` rule, or cleaning up old files. Nextflow seamlessly recognizes cached process' results when given the `-resume` flag.
 
-Debugging errors in processes works great. When an error occurs, you can `cd` into the relevant `/work` directory, and Nextflow provides log files, and a file that describes which command exactly was ran.
+Debugging errors in processes works great. When an error occurs, you can `cd` into the relevant `/work` directory, and Nextflow provides log files, and a file that describes which command exactly was ran. This allows you to debug the error in the same environment as it will be ran, and then resume the workflow from that point.
 
 ### Metrics
 
-Nextflow can create timeline charts, and a DAG diagram of the pipeline.
+Nextflow can create timeline charts:
+
+![nextflow-timeline](https://github.com/bionode/gsoc16/raw/543ba66cbb42d1622089764bf01090e318307a57/pipelines/with-nextflow/timeline.png)
+
+and a DAG diagram of the pipeline (also notice I was able to create a "forking" pipeline unlike with Snakemake):
+
+![nextflow-workflow](https://github.com/bionode/gsoc16/raw/543ba66cbb42d1622089764bf01090e318307a57/pipelines/with-nextflow/workflow.png)
 
 ### Scaling
 
-You might have noticed the `container` [directive] in the above processes. Nextflow comes with built-in docker integration, which is great. *Each process can run in its own container*. This helps improve the portability and reproducibiltiy of the workflow. All a consumer needs installed on their system is Docker and Nextflow (and you can even run Nextflow in Docker). Each container can use a tagged version, ensuring when someone else runs the pipeline, they are using the *exact same version of each tool*. You could, of course use Docker in your Snakemake commands, but there would be overhead from volume mounting (mapping a local folder to a folder inside the container); Nextflow handles all that for you. As well, Nextflow has built in support for many cluster engines, which can be enabled by defining the `executor` in `nextflow.config`. Another feature to not is Nextflow's integration with GitHub. With a `main.nf` in your repo, you can run a pipeline with `nextflow run username/repo`. 
+You might have noticed the `container` [directive][nextflow-directive] in the above processes. Nextflow comes with built-in docker integration, which is great. *Each process can run in its own container*. This helps improve the portability and reproducibiltiy of the workflow. All a consumer needs installed on their system is Docker and Nextflow (and you can even run Nextflow in Docker). Each container can use a tagged version, ensuring when someone else runs the pipeline, they are using the *exact same version of each tool*. You could, of course use Docker in your Snakemake commands, but there would be overhead from volume mounting (mapping a local folder to a folder inside the container); Nextflow handles all that for you. As well, Nextflow has built in support for many cluster engines, which can be enabled by defining the `executor` in `nextflow.config`. Another feature to not is Nextflow's integration with GitHub. With a `main.nf` in your repo, you can run a pipeline with `nextflow run username/repo`. 
 
 ## others
 
@@ -599,82 +670,244 @@ You might have noticed the `container` [directive] in the above processes. Nextf
 - reread workflows paper
 - reread Wonjune's report
 
-## Bionode Proposal
+## Conclusion
 
-- how can bionode+JS fit into this?
-- what was nice about bash? make? snakemake? nextflow?
-- what was annoying?
-- emergence of JS for high fidelity UIs and web backends
-- huge npm community
-- browsers + desktops (Electron)
-- native capabilities for events, async, streams
-- use node streams for piping of data between tools
-- integrate with CWl (spec 3 is done, or follow 4?)
-- as well, streams provide a good abstraction for creating **push** style pipelines
-- browser friendly tools are great for education
-- GUI benefit of tools like Galaxy, but still has all the nity gritty CLI customization
-- how to handle interative development. troubleshoot problems in middle of pipeline.
-- dev mode that also writes all streams to files? then hydro turbine can pick up because `task`s are wrapping streams?
-- can fork output into websocket, app, electron, slack, etc.
-- get interactive feedback from slack, email
-- hydro turbine because its a supercharged waterwheel
+On a scale from 1-5, these are my ratings for each tool. Mostly as relative to each other, rather than absolutely.
+
+| Tool      | Structure | Iterative Dev. | Metrics | Scale | Reproducibility |
+| --------- | --------- | -------------- | ------- | ----- | --------------- |
+| bash      | 1         | 1              | 1       | 1     | 1               |
+| make      | 2         | 2              | 1       | 1     | 1               |
+| Snakemake | 4         | 3              | 3       | 4     | 4               |
+| Nextflow  | 4         | 5              | 5       | 5     | 4               |
+
+I have not investigated the "others" from above to warrant their ranking.
+
+A quick summary:
+
+**bash**
+
+- "generic" scripting
+- simple variable interpolation - `$foo`
+- no metrics, difficult to scale
+- no reentrancy, poor iterative development
+
+**make**
+
+- structure more pipeline oriented than bash - tasks with *input* (prerequisites) and *output* (target)
+- introduces some element of reentrancy by skipping rules whose target already exists = improved iterative development over bash
+- can "fork" by defining variables that change a rule's prerequisites, and running again
+- no metrics, difficult to scale
+
+**Snakemake**
+
+- enhanced scripting over bash/make with Python while using make's well known rules structure
+- improved `{input}`, `{output}` syntax and power (e.g. `{input.a}` or `{input[n]}`) over make
+- run Python, shell, or R in rule
+- enhanced wildcarding: easier to understand, more powerful than make's `%`
+- benchmarks are OK - need to do manual work to get a full pipeline report
+- DAG is nice
+- dry run is nice (and possible because of "pull" paradigm)
+- can scale to multiple species easily, just need to make sure file names do not overlap
+- cannot create forking paths (e.g. use same reference for two different filtering tools). Could do it by changing `FINAL_OUTPUT` and running again, but then thats basically the same as it was in `make`. (again, if you know how to do this without wildcarding ambiguity - let me know!)
+
+**Nextflow**
+
+- dataflow paradigm - "push"
+- as a consequence of push, no dry run
+- as a consequence of push, flexible forking and dynamic pipelines
+- scale to multiple species effortlessly with no overlapping file name concerns
+- timeline, DAG, benchmarks metrics are all very nice
+- Docker is nice - improves reproducibility and shareability
+- cannot handle large `stdout | stdin` pipes across channels (e.g. one process for `bwa mem` and another for `samtools view`)
+
+**bionode-waterwheel** *proposal*
+
+- no DSL to learn - just JavaScript. Functional, built around async, events, and streams.
+
+- streams resonate well with *push* paradigm
+
+- support for piping `stdin`, `stdout` around, e.g. `bwa.mem().pipe(samtools.view())` . This enhances modularity of pipeline, rather than having one rule or process doing `bwa mem | samtools view`, which is really two commands, each deserving their own input, output, parameter definitions. This can aid in improving reproducibility and modularity, as tools with defined input, output, params could be confidentally dropped into the pipeline.
+
+- moduler interoperation with web apps, native apps (Electron), services (Slack, email). Imagine pipeline logs being sent over a websocket to your browser.
+
+- interoperation with npm ecosystem
+
+- integrate with CWL spec
+
+- metrics will be easier to consume since output will be JSON to be consumed by d3, browser apps, etc
+
+- modular, specific, customizable waterwheel "backend" can be integrated into browser or native apps, bringing more power to pipeline GUIs than Galaxy for instance, where it is complicated to develop a custom pipeline (some labs hire someone to create a custom xml config for their specific pipeline so that the wet lab can "click to play" in Galaxy)
+
+- variable interpolation - like ES6 template literals, which can take any valid JS expression:
+
+  ```javascript
+  const PORT = config.PORT
+  const template = `Server listening on port ${PORT}`
+  ```
+
+  which can actually evaluate any JS expression:
+
+  ```javascript
+  [1, 2, 3, 4].map(num => `is even: ${num % 2 === 0 ? 'true' : 'false'}`)
+  ```
+
+
+
+- simple examples with small datasets can be browser compatibile (see: nbind). Live browser examples are great for education - "run your own NGS pipeline, from the browser"
+- how to handle interative development is an open question. Can fork all streams into files for reentrancy while in a "develop" mode. 
+
+
+
+A draft pipeline with **bionode-waterwheel**:
 
 ```javascript
 const ncbi = require('bionode-ncbi')
 const wrapper = require('bionode-wrapper')
-const hydroTurbine = require('bionode-hydroturbine')
+const waterwheel = require('bionode-waterwheel')
 
-const { task, join, run } = hydroTurbine
+const { task, join, run } = waterwheel
+const { stdout, stdin, file, directory } = waterwheel.types
 
-const sra = task(ncbi.download('sra', '{params.readsID}'))
-const reference = task(ncbi.download('assembly', '{params.specie}'))
+// Can be passed in from CLI
+const pipelineParams = {
+  specie: 'Salmonella-enterica',
+  readsID: '2492428',
+  output: 'Salmonella-enterica.vcf'
+}
 
-// each stream always emits a final metadata item with
-// output, input, ...
-// this can be used to handle tools which do not describe name(s)
-// of output files from the command
-// then bionode-wrapper can use that to call tool correctly
-const reads = task(sra
-	.pipe(wrapper('fastq-dump --split-files --skip-techical --gzip {input}')))
+// params comes from initial pipeline call. params are things that do not
+// change how items are passed between processes, but decide output for the
+// pipeline as a whole. For example, species name and reference.
+const sra = task({
+  output: stdout()
+}, ncbi.download('sra', '{params.readsID}'))
 
-const index = task(reference
-	.pipe(wrapper('bwa index {input}')))
-	// if using C++ wrapped (can then also use asm!)
-	// .pipe(bwa.index)
+const reference = task({
+  output: stdout()
+}, ncbi.download('assembly', '{params.specie}'))
+const bwa_index = task({
+  input: file(),
+  output: file()
+}, wrapper('bwa index {input}'))
 
-// mem depends on index and reads
-const bam = task(join(reads, index)
-	.pipe(wrapper('bwa mem {index.input} {reads.output}'))
-	// this is where streams really kick in.
-    // {input} is a stream
-	.pipe(wrapper('samtools view -bh {input}'))
-	.pipe(wrapper('samtools sort {input} -o {output}'))
-	// can BAM be indexed as it is emitted?
-	.pipe(wrapper('samtools index {input}')))
 
-// when a stream appears twice, hydroTurbine will automatically duplicate it
-const call = join(reference, bam)
-	.pipe(wrapper('samtools mpileup -uf {reference.output} {bam.output}'))
-	.pipe(wrapper('bcftools call -c {input}'))
+// some tools you cannot decide output file
+// so, tell waterwheel to stream a file as stdout
+// there is --stdout for fastq-dump to give a streamed fastq, but trimmomatic
+// wants reads_1 and reads_2
+// tools that are not bionode will need to wrapper()ed
+const extract = task({
+  input: file('reads.sra'),
+  output: file([1, 2].map(n => `reads_${n}.fastq.gz`))
+}, wrapper('fastq-dump --split-files --skip-technical --gzip {input}'))
 
-// Run the whole pipeline
-run(call, { specie: 'Salmonella enterica', readsID: '2492428'})
-	.pipe(fs.createWriteStream('{output}.vcf'))
+const trim = task({
+  input: file([1, 2].map(n => `reads_${n}.fastq.gz`)),
+  output: {
+    pe: file([1, 2].map(n => `reads_${n}.trim.pe.fastq.gz`),
+    se: file([1, 2].map(n => `reads_${n}.trim.se.fastq.gz`)
+  },
+  opts: {
+    adapters: '../adapters'
+  }
+}, wrapper('''
+  trimmomatic PE -phred33 \
+  {input[0]} {input[1]} \
+  {output.pe[0]} {output.se[0]} \
+  {output.pe[1]} {output.se[1]} \
+  ILLUMINACLIP:{opts.adapters}/TruSeq3-PE.fa:2:30:10 \
+  LEADING:3 TRAILING:3 SLIDINGWINDOW:4:20 MINLEN:36 \
+'''))
 
-// Add filtering
-// Show how filtering can be forked in the stream
-// Dataflow makes more intuitive sense for complex pipelines. Lots of iterative development when writing a pull based workflow.
-// This is JS code. That has its benefits. CLI can be built around. Snakemake has an programmatic API, but Python can't do async/streams natively. Nextflow crashes JVM if you use stdin/stdout for bwa | samtools across channels.
-// No need to understand a new DSL. 
-// can you do this without running streams? thats why the task wrapper might be important
+const merge = task({
+  input: file(),
+  output: stdout()
+}, wrapper('seqtk mergepe {input}'))
 
+const gzip = task({
+  input: stdin(),
+  output: stdout()
+}, wrapper('gzip - > {output}'))
+
+// Branching: these two filtering types produce the same type of output
+// So we can pass an array, and define them both under the same input/output
+const filter = task({
+  input: file()
+  output: file()
+  opts: {
+    tmpDir: directory()
+  }
+}, [wrapper('''
+  kmc -k{params.KMERSIZE} -m{params.MEMORYGB} -t{params.THREADS} {input} reads.trim.pe.kmc {opts.tmp} \
+  kmc_tools filter reads.trim.pe.kmc -cx{params.MINCOVERAGE} {input} -ci0 -cx0 {output} \
+'''), wrapper('''
+  load-into-counting.py -N 4 -k {params.KMERSIZE} -M {params.MEMORYGB}e9 -T {params.THREADS} reads.trim.pe.fastq.gz.kh {input} \
+  abundance-dist.py reads.trim.pe.fastq.gz.kh {input} reads.trim.pe.fastq.gz.kh.hist \
+  filter-abund.py -T {params.THREADS} -C ${MINCOVERAGE} reads.trim.pe.fastq.gz.kh -o {output} {input} \
+''')])
+
+// file() dependencies will stop stream.
+// for example, need to wait on an index file to be made before aligning
+const bwa_mem = task({
+  input: {
+    reference: file(),
+    index: file(), // check for reference indexing
+    sample: file() // output of filter
+  }
+  output: stdout()
+}, wrapper('bwa mem {input.reference} {input.sample}'))
+
+// This is where streams in Node can really show
+// In snakemake or Nextflow, this would be bwa mem | samtools view
+// Which is less modular, reproducible, containerizable
+const samtools_view = task({
+  input: stdin(),
+  output: stdout()
+}, wrapper('samtools view -Sbh {input}'))
+
+const samtools_sort = task({
+  input: stdin(),
+  output: stdout()
+}, wrapper('samtools sort {input}'))
+
+const samtools_index = task({
+  input: stdin(),
+  output: stdout()
+}, wrapper('samtools index {input}'))
+
+// these will all get piped through each other:
+// bwa_mem().pipe(samtools_view()).pipe(samtools_sort()).pipe(samtools_index())
+const align = join([bwa_mem, samtools_view, samtools_sort, samtools_index])
+
+const samtools_mpileup = task({
+  input: {
+    bam: file(),
+    index: file(),
+    reference: file()
+  },
+  output: stdout()
+}, wrapper('samtools mpileup -uf {input.bam} {input.reference}'))
+
+const bcftools_call = task({
+  input: stdin(),
+  output: stdout()
+}, wrapper('bcftools call -c {input}'))
+
+const callVariants = join([samtools_mpileup, bcftools_call])
+
+// need a way to use output of another task as input for this one
+const pipeline = join(
+  [sra, extract, trim, merge],
+  // this creates a branching
+  filter,
+  align,
+  callVariants
+)
+
+// Run the whole pipeline, passing in params
+run(pipelineParams, pipeline).pipe(task(fs.createWriteStream('{output}')))
 ```
-
-
-
-## Conclusion
-
-We have looked at z, y, z. We have discovered x, y, z. To investigate is x, y, z.
 
 [bionode-ncbi]: https://github.com/bionode/bionode-ncbi
 [bionode-ncbi-bug]: https://github.com/bionode/bionode-ncbi/issues/19
