@@ -658,17 +658,18 @@ and a DAG diagram of the pipeline (also notice I was able to create a "forking" 
 
 You might have noticed the `container` [directive][nextflow-directive] in the above processes. Nextflow comes with built-in docker integration, which is great. *Each process can run in its own container*. This helps improve the portability and reproducibiltiy of the workflow. All a consumer needs installed on their system is Docker and Nextflow (and you can even run Nextflow in Docker). Each container can use a tagged version, ensuring when someone else runs the pipeline, they are using the *exact same version of each tool*. You could, of course use Docker in your Snakemake commands, but there would be overhead from volume mounting (mapping a local folder to a folder inside the container); Nextflow handles all that for you. As well, Nextflow has built in support for many cluster engines, which can be enabled by defining the `executor` in `nextflow.config`. Another feature to not is Nextflow's integration with GitHub. With a `main.nf` in your repo, you can run a pipeline with `nextflow run username/repo`. 
 
+Finally, be sure to check out [awesome-nextflow](https://github.com/nextflow-io/awesome-nextflow)!
+
 ## others
 
-- luigi
-- airbnb
-- toil
-- bcbio
-- gulp - https://github.com/pachterlab/kallisto/blob/master/gulpfile.js
-- awesome-pipeline
-- scipipe
-- reread workflows paper
-- reread Wonjune's report
+- [awesome-pipeline](https://github.com/pditommaso/awesome-pipeline)
+- [luigi](https://github.com/spotify/luigi) and [sciluigi](https://github.com/pharmbio/sciluigi)
+- [airflow](https://github.com/apache/incubator-airflow)
+- [toil](https://github.com/BD2KGenomics/toil)
+- [bcbio](https://github.com/chapmanb/bcbio-nextgen)
+- [example gulpfile simple pipeline](https://github.com/pachterlab/kallisto/blob/master/gulpfile.js)
+- [scipipe](https://github.com/scipipe/scipipe)
+- [node-datapumps](https://github.com/agmen-hu/node-datapumps)
 
 ## Conclusion
 
@@ -754,7 +755,7 @@ A quick summary:
 
 
 
-- simple examples with small datasets can be browser compatibile (see: nbind). Live browser examples are great for education - "run your own NGS pipeline, from the browser"
+- simple examples with small datasets can be browser compatibile (see: [nbind](https://github.com/charto/nbind)). Live browser examples are great for education - "run your own NGS pipeline, from the browser"
 - how to handle interative development is an open question. Can fork all streams into files for reentrancy while in a "develop" mode. 
 
 
@@ -770,15 +771,15 @@ const { task, join, run } = waterwheel
 const { stdout, stdin, file, directory } = waterwheel.types
 
 // Can be passed in from CLI
+// params for final pipeline call. params are things that do not
+// change how items are passed between processes, but decide output for the
+// pipeline as a whole. For example, species name and reads accession.
 const pipelineParams = {
   specie: 'Salmonella-enterica',
   readsID: '2492428',
   output: 'Salmonella-enterica.vcf'
 }
 
-// params comes from initial pipeline call. params are things that do not
-// change how items are passed between processes, but decide output for the
-// pipeline as a whole. For example, species name and reference.
 const sra = task({
   output: stdout()
 }, ncbi.download('sra', '{params.readsID}'))
