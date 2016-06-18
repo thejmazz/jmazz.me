@@ -104,12 +104,10 @@ bcftools call -c - > reads.vcf
 
 `mpileup` creates a BCF [pileup][pileup] file describing the base calls of aligned reads. Then `bcftools call` takes this and generates a [variant call format][vcf] file.
 
-> Since `samtools` was complaining about the `reference.genomic.fna.gz` that comes from the NCBI Assemblies database - something to do with the compression format, I first decompressed it with:
->
-> ```bash
-> bgzip -d reference.genomic.fna.gz
-> ```
-
+Since `samtools` was complaining about the `reference.genomic.fna.gz` that comes from the NCBI Assemblies database - something to do with the compression format, I first decompressed it with:
+```bash
+bgzip -d reference.genomic.fna.gz
+```
 
 
 Thats it! Thats how to get from SRA $\rightarrow$ VCF using bionode, sra tools, trimming tools, filtering tools, bwa, samtools, and bcftools. The next sections will go over how to improve the reproducibility, reentrancy, ease of development, etc. of this workflow. 
@@ -351,9 +349,7 @@ time:
 	echo "Target $@ took $$runtime seconds"
 ```
 
-This clutters the code fast, and is unmaintainable. It might be possible to do it cleaner, but I did not spend time trying obscure solutions. TODO link to SO question, bash function to wrap and time? The point is that there is no "out of the box" way to get task metrics with `make`. You can imagine how tricky it might be to also get RAM/CPU usage for each task.
-
-TODO use make wildcarding.
+This clutters the code fast, and is unmaintainable. It might be possible to do it cleaner, but I did not spend time trying obscure solutions. The point is that there is no "out of the box" way to get task metrics with `make`. You can imagine how tricky it might be to also get RAM/CPU usage for each task.
 
 ### Scaling
 
@@ -441,7 +437,7 @@ Here it unnecessarily redoes certain steps. This is because `Salmonella-enterica
 
 Moreover - because the **pull** workflow style depends on *targets* and *prerequisites*, it can be difficult to achieve a branch-merge pipeline. We will see with Nextflow, which follows the dataflow paradigm, or **push**, it is natural to describe such pipelines.
 
-For a more complicated (and real world) snakemake setup, take a look at [pachterlab/kallisto_paper_analysis/Snakefile][https://github.com/pachterlab/kallisto_paper_analysis/blob/nbt/Snakefile].
+For a more complicated (and real world) snakemake setup, take a look at [pachterlab/kallisto_paper_analysis/Snakefile](https://github.com/pachterlab/kallisto_paper_analysis/blob/nbt/Snakefile).
 
 ### Iterative Development
 
@@ -982,4 +978,3 @@ run(pipelineParams, pipeline).pipe(task(fs.createWriteStream('{output}')))
 [nextflow-groovy]: http://www.nextflow.io/docs/latest/script.html
 [nextflow-directive]: http://www.nextflow.io/docs/latest/process.html#directives
 [wrappers-repository]: https://bitbucket.org/snakemake/snakemake-wrappers
-
