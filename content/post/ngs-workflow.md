@@ -29,6 +29,10 @@ TODO introduce, explain problem better.
 
 We will be running a simple variant calling pipeline using a referenence genome and paired end genomic reads. For the sake of time when running the pipeline locally, we will use a small genome, *Salmonella enterica*, which has some paired end reads at about 100mb in size. With the reference genome at about 1.4mb, that provides about 70x coverage. 
 
+To follow along with this blog post, you will need to install: bionode-ncbi, sra-toolkit, bwa, samtools, bcftools, khmer, kmc, trimmomatic, snakemake, and nextflow.
+
+Ha, I'm just kidding. Here is the Dockerfile: [polyglot-ngs-01](https://hub.docker.com/r/thejmazz/polyglot-ngs-01/).
+
 [bionode-ncbi][bionode-ncbi] will be used to download the reads from the NCBI SRA, or *sequence read archive*. The reference could be downloaded with `bionode-ncbi download assembly $specie` , but at the moment there is a [bug][bionode-ncbi-bug] where that downloads the `rna_from_genomic` rather than `genomic` file for some species.
 
 Once we have the an `sra` for *Salmonella enterica*, the next step is to generate the two `fastq` files for the two ended reads. Paired ends have a 5' $\rightarrow$ 3' set of reads and a 3' $\rightarrow$ 5' set of reads. This allows for much more confident alignment and is generally preferred over a single set of reads. For this we can use `fastq-dump` from [sra tools][sra-tools]:
@@ -662,14 +666,62 @@ Finally, be sure to check out [awesome-nextflow](https://github.com/nextflow-io/
 
 ## others
 
-- [awesome-pipeline](https://github.com/pditommaso/awesome-pipeline)
-- [luigi](https://github.com/spotify/luigi) and [sciluigi](https://github.com/pharmbio/sciluigi)
-- [airflow](https://github.com/apache/incubator-airflow)
-- [toil](https://github.com/BD2KGenomics/toil)
-- [bcbio](https://github.com/chapmanb/bcbio-nextgen)
+[awesome-pipeline](https://github.com/pditommaso/awesome-pipeline) is a great list of many pipeline and workflow tools. Here are some I think are more relevant, and a few extras (though you should try to look through all of them, at least look at these):
+
+- [anduril](http://anduril.org/userguide/) - Component-based workflow framework for scientific data analysis
+- [antha](https://www.antha-lang.org/docs/concepts/flow-based-programming.html) - High-level language for biology
+
+
+- [bpipe](http://docs.bpipe.org/Examples/PairedEndAlignment/) - Tool for running and managing bioinformatics pipelines
+- [Conan2](https://github.com/tburdett/Conan2) - Light-weight workflow management application
+- [cosmos](https://github.com/LPM-HMS/COSMOS2) - Python library for massively parallel workflows
+- [drake](https://github.com/Factual/drake) - Robust DSL akin to Make, implemented in Clojure
+- [kronos](http://kronos.readthedocs.io/en/latest/) - Workflow assembler for cancer genome analytics and informatics
+- [loom](http://kronos.readthedocs.io/en/latest/) - Tool for running bioinformatics workflows locally or in the cloud
+- [moa](http://moa.readthedocs.io/en/latest/) - Lightweight workflows in bioinformatics
+- [OpenGE](https://github.com/adaptivegenome/openge) - Accelerated framework for manipulating and interpreting high-throughput sequencing data
+- [pipengine](https://github.com/fstrozzi/bioruby-pipengine#-the-pipeline-yaml-) - Ruby based launcher for complex biological pipelines
+- [ruffus](http://www.ruffus.org.uk/) - Computation Pipeline library for Python
+- [YAP](http://opensource.nibr.com/yap/) - Extensible parallel framework, written in Python using OpenMPI libraries
+
+
+- [clusterflow](http://clusterflow.io/examples/) - Command-line tool which uses common cluster managers to run bioinformatics pipelines
+
+
+- [hive](https://github.com/Ensembl/ensembl-hive) - System for creating and running pipelines on a distributed compute resource
+- [google cloud dataflow](https://cloud.google.com/dataflow/docs/) - unified programming model and a managed service for developing and executing a wide range of data processing patterns including ETL, batch computation, and continuous computation
+- [makeflow](http://ccl.cse.nd.edu/software/makeflow/) - Workflow engine for executing large complex workflows on clusters
+- [scoop](https://github.com/soravux/scoop/) - Scalable Concurrent Operations in Python
+- [luigi](https://github.com/spotify/luigi) and [sciluigi](https://github.com/pharmbio/sciluigi) - Python module that helps you build complex pipelines of batch jobs, luigi wrapper for scientific workflows
+
+
+- [galaxy](https://usegalaxy.org/) - Web-based platform for biomedical research
+- [taverna](https://taverna.incubator.apache.org/introduction/) - Domain independent workflow system
+
+
+
+- [rabix](https://github.com/rabix/rabix) - implementation of CWL2
+
+
+- [cuneiform](https://github.com/joergen7/cuneiform) - Advanced functional workflow language and framework, implemented in Erlang
+- [mario](http://ccl.cse.nd.edu/software/makeflow/) - Scala library for defining data pipelines
+
+
+
+- [airflow](https://github.com/apache/incubator-airflow) - Python-based workflow system created by AirBnb
+- [pinball](https://github.com/pinterest/pinball) - Python based workflow engine by Pinterest
+
+
+
+- [AWS Data Pipeline](https://aws.amazon.com/datapipeline/) and [SWF](https://aws.amazon.com/swf/) - data workflow orchestration
+- [DRAY: Docker Workflow Engine](http://dray.it/) - UNIX pipes for Docker
+- [toil](https://github.com/BD2KGenomics/toil) - CWL3 and WDL support
+- [bcbio](https://github.com/chapmanb/bcbio-nextgen) -  best-practice pipelines for automated analysis of high throughput sequencing data
 - [example gulpfile simple pipeline](https://github.com/pachterlab/kallisto/blob/master/gulpfile.js)
-- [scipipe](https://github.com/scipipe/scipipe)
-- [node-datapumps](https://github.com/agmen-hu/node-datapumps)
+- [scipipe](https://github.com/scipipe/scipipe) - workflow system in Go inspired by Flow-based programming
+- [node-datapumps](https://github.com/agmen-hu/node-datapumps) - Node.js ETL toolkit for easy data import, export or transfer between systems
+
+Quite a lot. 
 
 ## Conclusion
 
@@ -679,8 +731,8 @@ On a scale from 1-5, these are my ratings for each tool. Mostly as relative to e
 | --------- | --------- | -------------- | ------- | ----- | --------------- |
 | bash      | 1         | 1              | 1       | 1     | 1               |
 | make      | 2         | 2              | 1       | 1     | 1               |
-| Snakemake | 4         | 3              | 3       | 4     | 4               |
-| Nextflow  | 4         | 5              | 5       | 5     | 4               |
+| Snakemake | 4         | 3              | 3       | 3     | 4               |
+| Nextflow  | 4         | 5              | 5       | 5     | 5               |
 
 I have not investigated the "others" from above to warrant their ranking.
 
