@@ -1,14 +1,14 @@
 ---
 date: 2016-06-08T12:27:27-04:00
 title: NGS Workflows
-tags: 
+tags:
 ---
 
-*Next generation sequencing*. We all know that a fundamental practice in bioinformatics is the analysis of biological sequences. Similarities, functions, structures, associations, transcripts, proteins, RNA interference, regulation, interaction, DNA binding, the list goes on. Much can be hypothesized given some ATCGs (and some annotations). 
+*Next generation sequencing*. We all know that a fundamental practice in bioinformatics is the analysis of biological sequences. Similarities, functions, structures, associations, transcripts, proteins, RNA interference, regulation, interaction, DNA binding, the list goes on. Much can be hypothesized given some ATCGs (and some annotations).
 
 However, its **not plug and play**.  Various tools and algorithms exists for each step in NGS data pipelines. Each with their own advantages and disadvantages for a given set of data (e.g. bacterial vs. eukaryotic genomes). Their underlying algorithms can make assumptions which may not be true in all cases. New tools and methods are being developed and there are **rarely adopted standards**. Researchers today regularly construct hardcoded and unmaintanable scripts. I am not calling out these individuals on their coding practice, but rather positing that scripts without community maintained modular dependencies, with dependence on a specific environment configuration - let alone hardcoded absolute file references, are by their nature **unfit for providing reproducible NGS workflows to the community at large**. But hey, it [![works badge](https://cdn.rawgit.com/nikku/works-on-my-machine/v0.2.0/badge.svg)](https://github.com/nikku/works-on-my-machine) right?
 
-A well written **bash script** *can* be version controlled, and dependencies *can* be described, however the consumer *may* not be able to achieve an identical environment. At the very least, it will be a painful setup process.  Similarly, a **python script** is definitely more elegant and modular, but still suffers from issues such as pipeline reentrancy. One popular old tool is **make**, which can improve reentrancy by defining *rules* which have a *target* (output) and *input*s. However, the syntax is not newcomer friendly and file pattern matching can be confusing or limited. 
+A well written **bash script** *can* be version controlled, and dependencies *can* be described, however the consumer *may* not be able to achieve an identical environment. At the very least, it will be a painful setup process.  Similarly, a **python script** is definitely more elegant and modular, but still suffers from issues such as pipeline reentrancy. One popular old tool is **make**, which can improve reentrancy by defining *rules* which have a *target* (output) and *input*s. However, the syntax is not newcomer friendly and file pattern matching can be confusing or limited.
 
 Not all hope is lost. There are have been many great efforts approaching this issue. One is **snakemake** which defines an elegant python-esque makefile with filename wildcarding, support for inline Python and R, and more. Another is **nextflow**, which goes a step further and describes pipelines through isolated (and containerizable) *process* blocks which communicate through channels. As well there are extras like galaxy, luigi, and bcbio.
 
@@ -23,7 +23,7 @@ Then discuss other alternatives in brief. Finally I will propose where Bionode a
 
 ## Variant Calling Pipeline
 
-We will be running a simple variant calling pipeline using a referenence genome and paired end genomic reads. For the sake of time when running the pipeline locally, we will use a small genome, *Salmonella enterica*, which has some paired end reads at about 100mb in size. With the reference genome at about 1.4mb, that provides about 70x coverage. 
+We will be running a simple variant calling pipeline using a referenence genome and paired end genomic reads. For the sake of time when running the pipeline locally, we will use a small genome, *Salmonella enterica*, which has some paired end reads at about 100mb in size. With the reference genome at about 1.4mb, that provides about 70x coverage.
 
 To follow along with this blog post, you will need to install: bionode-ncbi, sra-toolkit, bwa, samtools, bcftools, khmer, kmc, trimmomatic, snakemake, and nextflow.
 
@@ -45,13 +45,13 @@ Filtering will be two step:
 
 1. trim reads adapters with [trimmomatic][trimmomatic]
 
-2. filter out bad [*k*-mers][k-mer] with 
+2. filter out bad [*k*-mers][k-mer] with
 
    a) khmer
 
    b) kmc
 
-This allows us to illustrate how much the pipeline tools let us swap in and out different tools for the same step (in this instance, khmer vs kmc) and then compare results. 
+This allows us to illustrate how much the pipeline tools let us swap in and out different tools for the same step (in this instance, khmer vs kmc) and then compare results.
 
 The filtering steps will complete by producing a `reads.filtered.fastq.gz` file. With other tools, it could have been a `reads_1.filtered.fastq.gz` and `reads_2.fastq.gz`.  It depends whether or not one of the filtering tools creates an *interleaved* file holding both read directions. It does not matter too much, as the next step can handle both cases. If we wanted to skip filtering, we could just use `reads_1.fastq.gz` and `reads_2.fastq.gz`.
 
@@ -108,7 +108,7 @@ bgzip -d reference.genomic.fna.gz
 ```
 
 
-Thats it! Thats how to get from SRA $\rightarrow$ VCF using bionode, sra tools, trimming tools, filtering tools, bwa, samtools, and bcftools. The next sections will go over how to improve the reproducibility, reentrancy, ease of development, etc. of this workflow. 
+Thats it! Thats how to get from SRA $\rightarrow$ VCF using bionode, sra tools, trimming tools, filtering tools, bwa, samtools, and bcftools. The next sections will go over how to improve the reproducibility, reentrancy, ease of development, etc. of this workflow.
 
 ## Topics
 
@@ -137,7 +137,7 @@ For each tool, we will inspect the following topics.
 
 ## bash
 
-The first obvious tool to use constructing a pipeline composed of a list of shell commands is a simple bash script. Essentially, we can take the commands from above and arrange them in a linear manner. You can see the full bash pipeline here: [basic-snp-calling.sh](https://github.com/bionode/gsoc16/blob/543ba66cbb42d1622089764bf01090e318307a57/pipelines/with-bash/basic-snp-calling.sh). 
+The first obvious tool to use constructing a pipeline composed of a list of shell commands is a simple bash script. Essentially, we can take the commands from above and arrange them in a linear manner. You can see the full bash pipeline here: [basic-snp-calling.sh](https://github.com/bionode/gsoc16/blob/543ba66cbb42d1622089764bf01090e318307a57/pipelines/with-bash/basic-snp-calling.sh).
 
 ### Basic Structure
 
@@ -204,7 +204,7 @@ fi
 
 At this point, the pipeline branches into two modes. Currently, if we wanted to switch filter modes, we have to edit the definition of `FILTER_MODE` and restart the pipeline. If we are not checking for file existence before each command, this will be a big time waste. You can imagine how even deeper branching options can complicate it more. As well, it can be useful to change tool parameters and inspect the effects on final results. As an annoyance, changing these settings requires editing the file every time: this script would not scale to 100s of species well.
 
-After the filtering, the final section, alignment and calling, uses a variable set by the filtering option used to determine which reads to align with and the name of the final output. We can run the pipeline two times, wasting time, but at least the final results do not overwrite each other. 
+After the filtering, the final section, alignment and calling, uses a variable set by the filtering option used to determine which reads to align with and the name of the final output. We can run the pipeline two times, wasting time, but at least the final results do not overwrite each other.
 
 ### Iterative Development
 
@@ -239,7 +239,7 @@ The above script might work for pipelines which only take one input parameter fo
 species=(Salmonella-enterica Staphylococcus-aureus)
 readsID=(2492428 1274026)
 
-for i in "${!species[@]}"; do 
+for i in "${!species[@]}"; do
     printf "%s\t%s\t%s\n" $i ${species[$i]} ${readsID[$i]}
 done
 ```
@@ -248,11 +248,11 @@ However, this would probably involve multiple code changes throughout the script
 
 Furthermore, changing settings like maximum threads and memory usage will require manually editing the script when on the cluster, versus other tools which can provide this a command line option. Of course, *you could parse your own params*, but that is a lot of manual work.
 
-In terms of reproducibility, there is not much. The script will likely assume all dependencies are installed. It may assume required binaries are in a specific place (in my script I used the `BIN` variable for this). It may also even fail on systems with different commands. It may also even assume being in a certain directory and directory structures of the system. 
+In terms of reproducibility, there is not much. The script will likely assume all dependencies are installed. It may assume required binaries are in a specific place (in my script I used the `BIN` variable for this). It may also even fail on systems with different commands. It may also even assume being in a certain directory and directory structures of the system.
 
 ## make
 
-`make` and `Makefile` are old, well known tools that are normally used for C/C++ compilation. The complete `Makefile` is [here](https://github.com/bionode/gsoc16/blob/543ba66cbb42d1622089764bf01090e318307a57/pipelines/with-make/Makefile). 
+`make` and `Makefile` are old, well known tools that are normally used for C/C++ compilation. The complete `Makefile` is [here](https://github.com/bionode/gsoc16/blob/543ba66cbb42d1622089764bf01090e318307a57/pipelines/with-make/Makefile).
 
 ### Basic Structure
 
@@ -400,7 +400,7 @@ rule download_sra:
             bionode-ncbi download sra {readsID};
             cp {readsID}/*.sra {output} && rm -rf {readsID};
         ''')       
-        
+
 rule call:
     input: '{specie}.sra'
     output: '{specie}.vcf'
@@ -449,7 +449,7 @@ rule clean:
     '''
 ```
 
-As opposed to `rm *.sra *.bam`. 
+As opposed to `rm *.sra *.bam`.
 
 ### Metrics
 
@@ -539,7 +539,7 @@ Nextflow follows the [dataflow programming paradigm](https://en.wikipedia.org/wi
 
 ### Basic Structure
 
-Nextflow uses **processes** as rules, and each process will occur in its own folder in `/work`. Since each process takes place in its own folder, using output from one task as input in another cannot be done the "conventional way". But that is alright, because Nextflow provides **channels** to communicate between processes. 
+Nextflow uses **processes** as rules, and each process will occur in its own folder in `/work`. Since each process takes place in its own folder, using output from one task as input in another cannot be done the "conventional way". But that is alright, because Nextflow provides **channels** to communicate between processes.
 
 Consider:
 
@@ -628,7 +628,7 @@ process downloadReference {
   referenceGenomeGz3 ) = referenceGenomeGz.into(3)
 ```
 
-This is also an example of an *executable container*, where the Dockerfile ends in `CMD ["curl"]`. 
+This is also an example of an *executable container*, where the Dockerfile ends in `CMD ["curl"]`.
 
 However, I encountered some issues when trying to dockerize everything. TODO talk about dockerizing processes in a pipe.
 
@@ -652,7 +652,7 @@ and a DAG diagram of the pipeline (also notice I was able to create a "forking" 
 
 ### Scaling
 
-You might have noticed the `container` [directive][nextflow-directive] in the above processes. Nextflow comes with built-in docker integration, which is great. *Each process can run in its own container*. This helps improve the portability and reproducibiltiy of the workflow. All a consumer needs installed on their system is Docker and Nextflow (and you can even run Nextflow in Docker). Each container can use a tagged version, ensuring when someone else runs the pipeline, they are using the *exact same version of each tool*. You could, of course use Docker in your Snakemake commands, but there would be overhead from volume mounting (mapping a local folder to a folder inside the container); Nextflow handles all that for you. As well, Nextflow has built in support for many cluster engines, which can be enabled by defining the `executor` in `nextflow.config`. Another feature to not is Nextflow's integration with GitHub. With a `main.nf` in your repo, you can run a pipeline with `nextflow run username/repo`. 
+You might have noticed the `container` [directive][nextflow-directive] in the above processes. Nextflow comes with built-in docker integration, which is great. *Each process can run in its own container*. This helps improve the portability and reproducibiltiy of the workflow. All a consumer needs installed on their system is Docker and Nextflow (and you can even run Nextflow in Docker). Each container can use a tagged version, ensuring when someone else runs the pipeline, they are using the *exact same version of each tool*. You could, of course use Docker in your Snakemake commands, but there would be overhead from volume mounting (mapping a local folder to a folder inside the container); Nextflow handles all that for you. As well, Nextflow has built in support for many cluster engines, which can be enabled by defining the `executor` in `nextflow.config`. Another feature to not is Nextflow's integration with GitHub. With a `main.nf` in your repo, you can run a pipeline with `nextflow run username/repo`.
 
 Finally, be sure to check out [awesome-nextflow](https://github.com/nextflow-io/awesome-nextflow)!
 
@@ -713,14 +713,14 @@ Finally, be sure to check out [awesome-nextflow](https://github.com/nextflow-io/
 - [scipipe](https://github.com/scipipe/scipipe) - workflow system in Go inspired by Flow-based programming
 - [node-datapumps](https://github.com/agmen-hu/node-datapumps) - Node.js ETL toolkit for easy data import, export or transfer between systems
 
-Quite a lot. 
+Quite a lot.
 
 ## Conclusion
 
 On a scale from 1-5, these are my ratings for each tool. Mostly as relative to each other, rather than absolutely.
 
 | Tool      | Structure | Iterative Dev. | Metrics | Scale | Reproducibility |
-| --------- | --------- | -------------- | ------- | ----- | --------------- |
+|:----------|:----------|:---------------|:--------|:------|:----------------|
 | bash      | 1         | 1              | 1       | 1     | 1               |
 | make      | 2         | 2              | 1       | 1     | 1               |
 | Snakemake | 4         | 3              | 3       | 3     | 4               |
@@ -800,13 +800,13 @@ A quick summary:
 
 
 - simple examples with small datasets can be browser compatibile (see: [nbind](https://github.com/charto/nbind)). Live browser examples are great for education - "run your own NGS pipeline, from the browser"
-- how to handle interative development is an open question. Can fork all streams into files for reentrancy while in a "develop" mode. 
+- how to handle interative development is an open question. Can fork all streams into files for reentrancy while in a "develop" mode.
 
 
 
 A draft pipeline with **bionode-waterwheel**:
 
-```javascript
+```js
 const ncbi = require('bionode-ncbi')
 const wrapper = require('bionode-wrapper')
 const waterwheel = require('bionode-waterwheel')
