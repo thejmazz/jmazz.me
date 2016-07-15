@@ -806,7 +806,7 @@ A quick summary:
 
 A draft pipeline with **bionode-waterwheel**:
 
-```js
+```javascript
 const ncbi = require('bionode-ncbi')
 const wrapper = require('bionode-wrapper')
 const waterwheel = require('bionode-waterwheel')
