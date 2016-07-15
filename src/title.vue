@@ -1,7 +1,5 @@
 <template>
-    <div>
-        Helloooo {{ title }}
-    </div>
+    <div>Helloooo {{ title }}!</div>
 </template>
 
 <script>
