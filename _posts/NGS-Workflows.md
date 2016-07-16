@@ -258,7 +258,7 @@ In terms of reproducibility, there is not much. The script will likely assume al
 
 With `make`, the pipeline can be made a little more cleaner, particularly with respect to *input* and *output* from each command. A `makefile` is composed of rules:
 
-```make
+```makefile
 rule <target>: <prerequisites...>
 	<command>
 ```
