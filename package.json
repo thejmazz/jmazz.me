@@ -6,7 +6,7 @@
     "webpack": "webpack --watch",
     "serve": "browser-sync start --server \"dist\" --files \"dist/**\"",
     "start": "concurrently --raw \"npm run webpack\" \"npm run serve\"",
-    "render": "npm run bundle-server && VUE_ENV=server node src/server",
+    "render": "npm run bundle-server && VUE_ENV=server node src/server/render.js",
     "bundle-server": "webpack --config webpack.node.js"
   },
   "dependencies": {

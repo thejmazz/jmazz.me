@@ -43,7 +43,7 @@ export default (context) => new Promise((resolve, reject) => {
       })
 
       const app = new Vue(Root)
-      
+
       resolve(app)
     })
   })

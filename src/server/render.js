@@ -4,11 +4,10 @@ const path = require('path')
 const fs = require('fs')
 
 const config = require('../config.js')
-console.log('config.postsDir': config.postsDir)
+const { postsDir, bundleLoc } = config
 
-const posts = fs.readdirSync(path.resolve(__dirname, '../../_posts'))
-
-const code = fs.readFileSync(path.resolve(__dirname, '../../dist/bundle-node.js'), 'utf-8')
+const posts = fs.readdirSync(postsDir)
+const code = fs.readFileSync(bundleLoc)
 
 const bundleRenderer = require('vue-server-renderer').createBundleRenderer(code)
 
