@@ -3,6 +3,8 @@
 const path = require('path')
 const fs = require('fs')
 
+const express = require('express')
+
 const {
   postsDir,
   bundleLoc
@@ -12,6 +14,7 @@ const {
 const code = fs.readFileSync(bundleLoc)
 const bundleRenderer = require('vue-server-renderer').createBundleRenderer(code)
 
+const app = express()
 
 const posts = fs.readdirSync(postsDir)
 
@@ -46,12 +49,21 @@ const postToStream = (post, outStream) => {
   return outStream
 }
 
-for (let post of posts) {
-  const postName = post.split('.md').join('')
+app.get('/', (req, res, next) => {
+  console.log('Gonna send out a stream')
+  res.set('Content-Type', 'text/html')
+  postToStream(posts[0], res)
+})
 
-  postToStream(post,
-    fs.createWriteStream(postName + '.html')
-      .on('finish', () => console.log(`Writing for /${postName}/ finished`))
-  )
-}
+app.listen(3001)
+console.log('Listening on 3001')
+
+// for (let post of posts) {
+//   const postName = post.split('.md').join('')
+
+//   postToStream(post,
+//     fs.createWriteStream(postName + '.html')
+//       .on('finish', () => console.log(`Writing for /${postName}/ finished`))
+//   )
+// }
 
