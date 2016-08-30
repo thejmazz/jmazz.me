@@ -3,25 +3,27 @@
 const path = require('path')
 const fs = require('fs')
 
-const config = require('../config.js')
-const { postsDir, bundleLoc } = config
+const {
+  postsDir,
+  bundleLoc
+} = require('../config.js')
 
-const posts = fs.readdirSync(postsDir)
+// Generate bundleRender from webpack bundle code
 const code = fs.readFileSync(bundleLoc)
-
 const bundleRenderer = require('vue-server-renderer').createBundleRenderer(code)
 
-for (let post of posts) {
-  const name = post.split('.md').join('')
+
+const posts = fs.readdirSync(postsDir)
+
+const postToStream = (post, outStream) => {
   const filepath = path.resolve(__dirname, '../../_posts', post)
 
-  const rs = bundleRenderer.renderToStream({
+  const renderStream = bundleRenderer.renderToStream({
     post,
     filepath
   })
 
-  const ws = fs.createWriteStream(name + '.html')
-  ws.write(`
+  outStream.write(`
 <doctype html>
 <html>
   <head>
@@ -33,13 +35,23 @@ for (let post of posts) {
   <body>
 `)
 
-  rs.on('error', (err) => console.log('ERROR: ', err))
-  rs.on('data', chunk => ws.write(chunk))
+  renderStream.on('error', (err) => console.log('ERROR: ', err))
+  renderStream.on('data', chunk => outStream.write(chunk))
 
-  ws.on('finish', () => console.log(`Writing for ${name} finished`))
-
-  rs.on('end', () => ws.end(`
+  renderStream.on('end', () => outStream.end(`
     </body>
 </html>
 `))
+
+  return outStream
 }
+
+for (let post of posts) {
+  const postName = post.split('.md').join('')
+
+  postToStream(post,
+    fs.createWriteStream(postName + '.html')
+      .on('finish', () => console.log(`Writing for /${postName}/ finished`))
+  )
+}
+
