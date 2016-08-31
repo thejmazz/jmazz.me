@@ -49,10 +49,31 @@ const postToStream = (post, outStream) => {
   return outStream
 }
 
-app.get('/', (req, res, next) => {
+app.get('/post', (req, res, next) => {
   console.log('Gonna send out a stream')
   res.set('Content-Type', 'text/html')
   postToStream(posts[0], res)
+})
+
+app.get('/', (req, res) => {
+  res.set('Content-Type', 'text/html')
+  res.write(`
+<html>
+<head><title>foo</title></head>
+<body>
+`)
+
+  const renderStream = bundleRenderer.renderToStream({
+    type: 'page'
+  })
+
+  renderStream.on('error', (err) => console.log('ERROR: ', err))
+  renderStream.on('data', chunk => res.write(chunk))
+
+  renderStream.on('end', () => res.end(`
+    </body>
+</html>
+`))
 })
 
 app.listen(3001)

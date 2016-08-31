@@ -32,19 +32,31 @@ export default (context) => new Promise((resolve, reject) => {
   console.log('context')
   console.log(context)
 
-  const md = fs.readFile(context.filepath, { encoding: 'utf-8' }, (err, data) => {
-    if (err) throw err
-
-    marked(data, (err, content) => {
+  if (context.post) {
+    const md = fs.readFile(context.filepath, { encoding: 'utf-8' }, (err, data) => {
       if (err) throw err
 
-      Root.data = () => ({
-        postContent: content
-      })
+        marked(data, (err, content) => {
+          if (err) throw err
 
-      const app = new Vue(Root)
+            Root.data = () => ({
+              postContent: content
+            })
 
-      resolve(app)
+            const app = new Vue(Root)
+
+            resolve(app)
+        })
     })
-  })
+  }
+
+  if (context.type === 'page') {
+    Root.data = () => ({
+      postContent: 'stub post'
+    })
+
+    const app = new Vue(Root)
+
+    resolve(app)
+  }
 })

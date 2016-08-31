@@ -7,7 +7,9 @@
     "serve": "browser-sync start --server \"dist\" --files \"dist/**\"",
     "start": "concurrently --raw \"npm run webpack\" \"npm run serve\"",
     "render": "npm run bundle-server && VUE_ENV=server node src/server/render.js",
-    "bundle-server": "webpack --config webpack.node.js"
+    "ssr": "VUE_ENV=server nodemon -w src src/server/index.js",
+    "bundle-server": "webpack --config webpack.node.js",
+    "bundle-server-watch": "webpack --watch --config webpack.node.js"
   },
   "dependencies": {
     "express": "^4.14.0",
@@ -17,6 +19,7 @@
     "vue-server-renderer": "^2.0.0-beta.1"
   },
   "devDependencies": {
+    "async-to-gen": "^1.0.5",
     "babel-core": "^6.10.4",
     "babel-loader": "^6.2.4",
     "babel-plugin-transform-runtime": "^6.9.0",
