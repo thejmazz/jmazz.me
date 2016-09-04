@@ -8,6 +8,7 @@ import marked from 'marked'
 import hljs from 'highlight.js'
 
 import Root from '../root.vue'
+import PostPreview from '../components/post-preview.vue'
 
 // === SET UP MARKED ===
 
@@ -58,5 +59,21 @@ export default (context) => new Promise((resolve, reject) => {
     const app = new Vue(Root)
 
     resolve(app)
+  }
+
+  if (context.type === 'home') {
+    fs.readdir(context.postsDir, (err, files) => {
+      const fullPost = fs.readFileSync(context.postsDir + '/' + files[0], 'utf-8')
+      const preview = fullPost.split('\n').slice(0, 22).join('\n')
+
+      marked(preview, (err, content) => {
+        PostPreview.data = () => ({
+          title: files[0],
+          summary: content
+        })
+
+        resolve(new Vue(PostPreview))
+      })
+    })
   }
 })
