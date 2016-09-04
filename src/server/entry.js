@@ -12,6 +12,7 @@ import hljs from 'highlight.js'
 import Root from '../root.vue'
 import PostPreview from '../components/post-preview.vue'
 import PostList from '../layouts/post-list.vue'
+import Post from '../layouts/post.vue'
 
 // === SET UP MARKED ===
 

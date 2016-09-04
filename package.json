@@ -3,13 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "webpack": "webpack --watch",
     "serve": "browser-sync start --server \"dist\" --files \"dist/**\"",
-    "start": "concurrently --raw \"npm run webpack\" \"npm run serve\"",
     "render": "npm run bundle-server && VUE_ENV=server node src/server/render.js",
     "ssr": "VUE_ENV=server nodemon -w src src/server/index.js",
-    "bundle-server": "webpack --config webpack.node.js",
-    "bundle-server-watch": "webpack --watch --config webpack.node.js"
+    "bundle-server": "webpack --watch --config webpack.node.js",
+    "bundle-client": "webpack --watch --config webpack.client.js"
   },
   "dependencies": {
     "bluebird": "^3.4.6",
@@ -29,6 +27,7 @@
     "browser-sync": "^2.13.0",
     "concurrently": "^2.2.0",
     "css-loader": "^0.23.1",
+    "extract-text-webpack-plugin": "^1.0.1",
     "html-webpack-plugin": "^2.22.0",
     "nodemon": "^1.10.2",
     "vue-hot-reload-api": "^2.0.5",

@@ -18,13 +18,8 @@ const app = express()
 
 const posts = fs.readdirSync(postsDir)
 
-const postToStream = (post, outStream) => {
-  const filepath = path.resolve(__dirname, '../../_posts', post)
-
-  const renderStream = bundleRenderer.renderToStream({
-    post,
-    filepath
-  })
+const postToStream = (context, outStream) => {
+  const renderStream = bundleRenderer.renderToStream(context)
 
   outStream.write(`
 <doctype html>
@@ -33,6 +28,7 @@ const postToStream = (post, outStream) => {
     <title>title</title>
     <style>
     ${fs.readFileSync(path.resolve(__dirname, '../hljs-theme.css'))}
+    ${fs.readFileSync(path.resolve(__dirname, '../../dist/styles.css'))}
     </style>
   </head>
   <body>
@@ -51,29 +47,18 @@ const postToStream = (post, outStream) => {
 
 app.get('/blog', (req, res) => {
   res.set('Content-Type', 'text/html')
-  res.write(`
-<html>
-<head><title>foo</title></head>
-<body>
-`)
-
-  const renderStream = bundleRenderer.renderToStream({
+  postToStream({
     type: 'home',
     postsDir
-  })
-
-  renderStream.on('error', (err) => console.log('ERROR: ', err))
-  renderStream.on('data', chunk => res.write(chunk))
-
-  renderStream.on('end', () => res.end(`
-    </body>
-</html>
-`))
+  }, res)
 })
 
 app.get('/blog/:post', (req, res) => {
   res.set('Content-Type', 'text/html')
-  postToStream(req.params.post + '.md', res)
+  postToStream({
+    post: req.params.post + '.md',
+    filepath: path.resolve(__dirname, '../../_posts', req.params.post + '.md')
+  }, res)
 })
 
 app.listen(3001)

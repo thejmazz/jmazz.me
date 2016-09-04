@@ -2,6 +2,7 @@
 
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 module.exports = {
   entry: './src/app.js',
@@ -19,5 +20,13 @@ module.exports = {
       include: [path.resolve(__dirname, './src')]
     }]
   },
-  plugins: [new HtmlWebpackPlugin()]
+  vue: {
+    loaders: {
+      css: ExtractTextPlugin.extract('css')
+    }
+  },
+  plugins: [
+    new HtmlWebpackPlugin(),
+    new ExtractTextPlugin('styles.css')
+  ]
 }

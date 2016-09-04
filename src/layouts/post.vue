@@ -23,7 +23,7 @@ export default {
 
 <style>
   .post-content {
-    width: 600px;
+    width: 700px;
     margin: 0 auto;
   }
 </style>
