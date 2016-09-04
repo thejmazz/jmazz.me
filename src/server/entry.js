@@ -66,21 +66,13 @@ export default (context) => new Promise((resolve, reject) => {
 
   if (context.type === 'home') {
     fs.readdir(context.postsDir, (err, files) => {
-      // const posts = files.map((file) => {
-
-      //   return {
-      //     title: file,
-      //     summary: preview
-      //   }
-      // })
-
       Promise.map(files, (file) => new Promise((resolve, reject) => {
         const fullPost = fs.readFileSync(context.postsDir + '/' + file, 'utf-8')
         const preview = fullPost.split('\n').slice(0, 22).join('\n')
 
         marked(preview, (err, content) => {
           resolve({
-            title: file,
+            title: file.replace(/\.md$/, ''),
             summary: content
           })
         })
@@ -93,16 +85,6 @@ export default (context) => new Promise((resolve, reject) => {
 
         resolve(new Vue(PostList))
       })
-
-
-      // marked(preview, (err, content) => {
-      //   PostPreview.data = () => ({
-      //     title: files[0],
-      //     summary: content
-      //   })
-
-      //   resolve(new Vue(PostPreview))
-      // })
     })
   }
 })

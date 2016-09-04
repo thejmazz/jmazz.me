@@ -49,13 +49,7 @@ const postToStream = (post, outStream) => {
   return outStream
 }
 
-app.get('/post', (req, res, next) => {
-  console.log('Gonna send out a stream')
-  res.set('Content-Type', 'text/html')
-  postToStream(posts[0], res)
-})
-
-app.get('/', (req, res) => {
+app.get('/blog', (req, res) => {
   res.set('Content-Type', 'text/html')
   res.write(`
 <html>
@@ -77,15 +71,11 @@ app.get('/', (req, res) => {
 `))
 })
 
+app.get('/blog/:post', (req, res) => {
+  res.set('Content-Type', 'text/html')
+  postToStream(req.params.post + '.md', res)
+})
+
 app.listen(3001)
 console.log('Listening on 3001')
-
-// for (let post of posts) {
-//   const postName = post.split('.md').join('')
-
-//   postToStream(post,
-//     fs.createWriteStream(postName + '.html')
-//       .on('finish', () => console.log(`Writing for /${postName}/ finished`))
-//   )
-// }
 

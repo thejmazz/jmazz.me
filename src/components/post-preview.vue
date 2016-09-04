@@ -1,6 +1,6 @@
 <template>
     <div class="post-preview">
-        <h2><a href="/post">{{ title }}</a></h2>
+        <h2><a :href="'/blog/' + title">{{ title }}</a></h2>
         <div class="post-summary" v-html="summary"></div>
     </div>
 </template>
