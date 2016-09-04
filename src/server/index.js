@@ -63,13 +63,10 @@ app.get('/', (req, res) => {
 <body>
 `)
 
-  // const renderStream = bundleRenderer.renderToStream({
-  //   type: 'page'
-  // })
-const renderStream = bundleRenderer.renderToStream({
-  type: 'home',
-  postsDir
-})
+  const renderStream = bundleRenderer.renderToStream({
+    type: 'home',
+    postsDir
+  })
 
   renderStream.on('error', (err) => console.log('ERROR: ', err))
   renderStream.on('data', chunk => res.write(chunk))

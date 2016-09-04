@@ -3,12 +3,15 @@
 import fs from 'fs'
 import path from 'path'
 
+import Promise from 'bluebird'
+
 import Vue from 'vue'
 import marked from 'marked'
 import hljs from 'highlight.js'
 
 import Root from '../root.vue'
 import PostPreview from '../components/post-preview.vue'
+import PostList from '../layouts/post-list.vue'
 
 // === SET UP MARKED ===
 
@@ -63,17 +66,43 @@ export default (context) => new Promise((resolve, reject) => {
 
   if (context.type === 'home') {
     fs.readdir(context.postsDir, (err, files) => {
-      const fullPost = fs.readFileSync(context.postsDir + '/' + files[0], 'utf-8')
-      const preview = fullPost.split('\n').slice(0, 22).join('\n')
+      // const posts = files.map((file) => {
 
-      marked(preview, (err, content) => {
-        PostPreview.data = () => ({
-          title: files[0],
-          summary: content
+      //   return {
+      //     title: file,
+      //     summary: preview
+      //   }
+      // })
+
+      Promise.map(files, (file) => new Promise((resolve, reject) => {
+        const fullPost = fs.readFileSync(context.postsDir + '/' + file, 'utf-8')
+        const preview = fullPost.split('\n').slice(0, 22).join('\n')
+
+        marked(preview, (err, content) => {
+          resolve({
+            title: file,
+            summary: content
+          })
+        })
+      })).then((posts) => {
+        console.log('posts:', posts)
+
+        PostList.data = () => ({
+          posts
         })
 
-        resolve(new Vue(PostPreview))
+        resolve(new Vue(PostList))
       })
+
+
+      // marked(preview, (err, content) => {
+      //   PostPreview.data = () => ({
+      //     title: files[0],
+      //     summary: content
+      //   })
+
+      //   resolve(new Vue(PostPreview))
+      // })
     })
   }
 })
