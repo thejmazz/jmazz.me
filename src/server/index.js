@@ -27,7 +27,8 @@ const postToStream = (context, outStream) => {
   <head>
     <title>title</title>
     <style>
-    ${fs.readFileSync(path.resolve(__dirname, '../hljs-theme.css'))}
+    ${fs.readFileSync(path.resolve(__dirname, '../css/hljs-theme.css'))}
+    ${fs.readFileSync(path.resolve(__dirname, '../css/global.css'))}
     ${fs.readFileSync(path.resolve(__dirname, '../../dist/styles.css'))}
     </style>
   </head>

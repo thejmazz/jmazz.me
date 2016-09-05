@@ -2,9 +2,7 @@
     <div>
       <my-header content="jmazz/blog"></my-header>
         <post-list :posts="posts"></post-list>
-      <p>
-        footer
-      </p>
+      <my-footer />
     </div>
 </template>
 
@@ -17,6 +15,7 @@
 
 <script>
 import Header from '../components/header.vue'
+import Footer from '../components/footer.vue'
 import PostList from './post-list.vue'
 
 export default {
@@ -24,6 +23,7 @@ export default {
   props: ['postContent'],
   components: {
     'my-header': Header,
+    'my-footer': Footer,
     'post-list': PostList
   }
 }

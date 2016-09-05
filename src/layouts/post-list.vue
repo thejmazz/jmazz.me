@@ -11,6 +11,7 @@
     list-style-type: none;
     width: 700px;
     margin: 0 auto;
+    padding-left: 0;
 }
 </style>
 
