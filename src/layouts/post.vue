@@ -14,6 +14,8 @@
     width: 700px;
     margin: 0 auto;
   }
+
+  /* img { width: 100%; } */
 </style>
 
 <script>

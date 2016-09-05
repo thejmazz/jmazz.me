@@ -1,6 +1,7 @@
 ---
 date: 2016-06-08T12:27:27-04:00
 title: NGS Workflows
+summaryLength: 18
 tags:
 ---
 
@@ -399,7 +400,7 @@ rule download_sra:
         shell('''
             bionode-ncbi download sra {readsID};
             cp {readsID}/*.sra {output} && rm -rf {readsID};
-        ''')       
+        ''')
 
 rule call:
     input: '{specie}.sra'
