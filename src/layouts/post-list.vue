@@ -9,6 +9,8 @@
 <style>
 .post-list {
     list-style-type: none;
+    width: 700px;
+    margin: 0 auto;
 }
 </style>
 
@@ -17,6 +19,7 @@ import PostPreview from '../components/post-preview.vue'
 
 export default {
   name: 'post-list',
+  props: [ 'posts' ],
   components: {
     'post-preview': PostPreview
   }

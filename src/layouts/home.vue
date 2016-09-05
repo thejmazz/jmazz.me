@@ -1,8 +1,7 @@
 <template>
     <div>
-      <my-header content="Post page"></my-header>
-      <div class="post-content" v-html="postContent">
-      </div>
+      <my-header content="jmazz/blog"></my-header>
+        <post-list :posts="posts"></post-list>
       <p>
         footer
       </p>
@@ -18,12 +17,14 @@
 
 <script>
 import Header from '../components/header.vue'
+import PostList from './post-list.vue'
 
 export default {
   name: 'Layout-Post',
-  /* props: ['postContent'], */
+  props: ['postContent'],
   components: {
-    'my-header': Header
+    'my-header': Header,
+    'post-list': PostList
   }
 }
 </script>

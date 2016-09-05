@@ -9,10 +9,8 @@ import Vue from 'vue'
 import marked from 'marked'
 import hljs from 'highlight.js'
 
-import Root from '../root.vue'
-import PostPreview from '../components/post-preview.vue'
-import PostList from '../layouts/post-list.vue'
 import Post from '../layouts/post.vue'
+import Home from '../layouts/home.vue'
 
 // === SET UP MARKED ===
 
@@ -44,25 +42,15 @@ export default (context) => new Promise((resolve, reject) => {
         marked(data, (err, content) => {
           if (err) throw err
 
-            Root.data = () => ({
+            Post.data = () => ({
               postContent: content
             })
 
-            const app = new Vue(Root)
+            const app = new Vue(Post)
 
             resolve(app)
         })
     })
-  }
-
-  if (context.type === 'page') {
-    Root.data = () => ({
-      postContent: 'stub post'
-    })
-
-    const app = new Vue(Root)
-
-    resolve(app)
   }
 
   if (context.type === 'home') {
@@ -80,11 +68,11 @@ export default (context) => new Promise((resolve, reject) => {
       })).then((posts) => {
         console.log('posts:', posts)
 
-        PostList.data = () => ({
+        Home.data = () => ({
           posts
         })
 
-        resolve(new Vue(PostList))
+        resolve(new Vue(Home))
       })
     })
   }

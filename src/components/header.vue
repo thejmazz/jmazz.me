@@ -1,6 +1,14 @@
 <template>
-  <h1> {{ content }} </h1>
+    <header>
+        <h1> {{ content }} </h1>
+    </header>
 </template>
+
+<style>
+header {
+    border-bottom: 2px solid black;
+}
+</style>
 
 <script>
   export default {
