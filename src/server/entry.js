@@ -13,6 +13,10 @@ import Post from '../layouts/post.vue'
 import Home from '../layouts/home.vue'
 
 // === SET UP MARKED ===
+import split from 'split2'
+import through from 'through2'
+import eos from 'end-of-stream'
+import yaml from 'js-yaml'
 
 const mdRenderer = new marked.Renderer()
 mdRenderer.code = (code, lang) => {
@@ -27,6 +31,47 @@ marked.setOptions({
   renderer: mdRenderer
 })
 
+const markdowned = (filePath) => new Promise((resolve, reject) => {
+  let frontMatter = ''
+  let markdown = ''
+
+  let parsingFM = true
+  let seenDashes = false
+
+  const ms = fs.createReadStream(filePath)
+    .pipe(split())
+    .pipe(through(function (chunk, enc, next) {
+      const line = chunk.toString()
+      if (line === '---' && !seenDashes) {
+        seenDashes = true
+        return next()
+      } else if (line === '---' && seenDashes) {
+        parsingFM = false
+        return next()
+      }
+
+      if (parsingFM) {
+        frontMatter += line + '\n'
+      } else {
+        markdown += line + '\n'
+      }
+
+      next()
+     }
+    ))
+
+  eos(ms, { readable: false }, (err) => {
+    marked(markdown, (err, html) => {
+      if (err) throw err
+
+      resolve({
+        attributes: yaml.safeLoad(frontMatter),
+        body: html
+      })
+    })
+  })
+})
+
 export default (context) => new Promise((resolve, reject) => {
   // do some async data fetching
   // use "context" passed from renderer as params (e.g. url)
@@ -36,20 +81,13 @@ export default (context) => new Promise((resolve, reject) => {
   console.log(context)
 
   if (context.post) {
-    const md = fs.readFile(context.filepath, { encoding: 'utf-8' }, (err, data) => {
-      if (err) throw err
+    markdowned(context.filepath)
+    .then((content) => {
+      Post.data = () => ({
+        postContent: content.body
+      })
 
-        marked(data, (err, content) => {
-          if (err) throw err
-
-            Post.data = () => ({
-              postContent: content
-            })
-
-            const app = new Vue(Post)
-
-            resolve(app)
-        })
+      resolve(new Vue(Post))
     })
   }
 
