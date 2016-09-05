@@ -5,7 +5,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 module.exports = {
-  entry: './src/app.js',
+  // entry: './src/app.js',
+  entry: './src/server/entry.js',
+  node: {
+    fs: 'empty'
+  },
   output: {
     path: 'dist',
     filename: 'bundle.js'

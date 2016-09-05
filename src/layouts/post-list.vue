@@ -6,6 +6,12 @@
     </ul>
 </template>
 
+<style>
+.post-list {
+    list-style-type: none;
+}
+</style>
+
 <script>
 import PostPreview from '../components/post-preview.vue'
 

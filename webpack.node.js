@@ -9,6 +9,7 @@ module.exports = {
     filename: 'bundle-node.js',
     libraryTarget: 'commonjs2'
   },
+  externals: Object.keys(require('./package.json').dependencies),
   target: 'node',
   module: {
     loaders: [{
