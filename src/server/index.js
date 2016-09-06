@@ -14,6 +14,11 @@ const {
 const code = fs.readFileSync(bundleLoc)
 const bundleRenderer = require('vue-server-renderer').createBundleRenderer(code)
 
+const template = fs.readFileSync(path.resolve(__dirname, './template.html'), 'utf-8')
+const i = template.indexOf('{{ APP }}')
+const head = template.slice(0, i)
+const tail = template.slice(i + '{{ APP }}'.length)
+
 const app = express()
 
 const posts = fs.readdirSync(postsDir)
@@ -21,27 +26,17 @@ const posts = fs.readdirSync(postsDir)
 const postToStream = (context, outStream) => {
   const renderStream = bundleRenderer.renderToStream(context)
 
-  outStream.write(`
-<doctype html>
-<html>
-  <head>
-    <title>title</title>
-    <style>
-    ${fs.readFileSync(path.resolve(__dirname, '../css/hljs-theme.css'))}
-    ${fs.readFileSync(path.resolve(__dirname, '../css/global.css'))}
-    ${fs.readFileSync(path.resolve(__dirname, '../../dist/styles.css'))}
-    </style>
-  </head>
-  <body>
-`)
+  outStream.write(head.replace('{{ STYLE }}', `
+      <style>
+        ${fs.readFileSync(path.resolve(__dirname, '../css/hljs-theme.css'))}
+        ${fs.readFileSync(path.resolve(__dirname, '../css/global.css'))}
+        ${fs.readFileSync(path.resolve(__dirname, '../../dist/styles.css'))}
+      </style>`))
 
   renderStream.on('error', (err) => console.log('ERROR: ', err))
   renderStream.on('data', chunk => outStream.write(chunk))
 
-  renderStream.on('end', () => outStream.end(`
-    </body>
-</html>
-`))
+  renderStream.on('end', () => outStream.end(tail))
 
   return outStream
 }
