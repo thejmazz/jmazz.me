@@ -36,10 +36,25 @@ export default (context) => new Promise((resolve, reject) => {
         marked({ file: context.postsDir + '/' + file, summary: true }).then((content) => {
           resolve({
             title: file.replace(/\.md$/, ''),
+            attributes: content.attributes,
             summary: content.body
           })
         })
-      })).then((posts) => {
+      }))
+      .then((posts) => {
+        // sort from latest to oldest
+        const dated = {}
+        const newPosts = []
+        posts.forEach((post, i) => {
+          dated[Date.parse(post.attributes.date)] = i
+        })
+        Object.keys(dated).sort().reverse().forEach((key, i) => {
+          newPosts[i] = posts[dated[key]]
+        })
+
+        return Promise.resolve(newPosts)
+      })
+      .then((posts) => {
         Home.data = () => ({
           posts
         })
