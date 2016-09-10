@@ -1,5 +1,7 @@
 'use strict'
 
+const path = require('path')
+
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
@@ -20,6 +22,9 @@ module.exports = Object.assign({}, base, {
         fallbackLoader: 'vue-style'
       })
     }
+  },
+  sassLoader: {
+    includePaths: [path.resolve(__dirname, '../src/scss')]
   },
   plugins: [
     // new HtmlWebpackPlugin(),

@@ -8,7 +8,7 @@
 </template>
 
 <style lang="sass">
-@import "../scss/_hljs-theme.scss";
+@import 'hljs-theme';
 
 .post-content {
 width: 700px;
