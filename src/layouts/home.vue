@@ -22,18 +22,22 @@ export default {
   name: 'Layout-Post',
   props: ['postContent'],
   data: () => ({
-    posts: [{
-        title: 'one',
-        summary: 'wheee'
-      }, {
-        title: 'two',
-        summary: 'whee'
-    }]
+    posts: []
   }),
   components: {
     'my-header': Header,
     'my-footer': Footer,
     'post-list': PostList
+  },
+  beforeMount() {
+    console.log('Starting beforeMount')
+
+    fetch('http://localhost:3001/api/allposts')
+    .then(res => res.json())
+    .then(body => {
+        console.log('got body:', body)
+      this.$data.posts = body
+    })
   }
 }
 </script>
