@@ -8,12 +8,15 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const base = require('./webpack.base.js')
 
 module.exports = Object.assign({}, base, {
+  entry: [
+    path.resolve(__dirname, '../src/entries/client.js')
+  ],
   node: {
     fs: 'empty'
   },
   output: {
     path: 'dist',
-    filename: 'bundle.js'
+    filename: 'bundle-client.js'
   },
   vue: {
     loaders: {

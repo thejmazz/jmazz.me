@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="app">
       <my-header content="jmazz/blog"></my-header>
         <post-list :posts="posts"></post-list>
       <my-footer />
@@ -21,6 +21,15 @@ import PostList from './post-list.vue'
 export default {
   name: 'Layout-Post',
   props: ['postContent'],
+  data: () => ({
+    posts: [{
+        title: 'one',
+        summary: 'wheee'
+      }, {
+        title: 'two',
+        summary: 'whee'
+    }]
+  }),
   components: {
     'my-header': Header,
     'my-footer': Footer,
