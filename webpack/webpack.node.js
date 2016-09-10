@@ -1,6 +1,9 @@
 'use strict'
 
+const path = require('path')
+
 const base = require('./webpack.base.js')
+const pkg = require(path.resolve(__dirname, '../package.json'))
 
 module.exports = Object.assign({}, base, {
   output: {
@@ -8,6 +11,6 @@ module.exports = Object.assign({}, base, {
     filename: 'bundle-node.js',
     libraryTarget: 'commonjs2'
   },
-  externals: Object.keys(require('./package.json').dependencies),
+  externals: Object.keys(pkg.dependencies),
   target: 'node'
 })

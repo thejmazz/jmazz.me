@@ -6,8 +6,10 @@
     "serve": "browser-sync start --server \"dist\" --files \"dist/**\"",
     "render": "npm run bundle-server && VUE_ENV=server node src/server/render.js",
     "ssr": "VUE_ENV=server nodemon -w src src/server/index.js",
-    "bundle-server": "webpack --watch --config webpack.node.js",
-    "bundle-client": "webpack --watch --config webpack.client.js"
+    "dev": "node webpack/bundler.js",
+    "bundle": "npm run bundle-server && npm run bundle-client",
+    "bundle-server": "webpack --config webpack/webpack.node.js",
+    "bundle-client": "webpack --config webpack/webpack.client.js"
   },
   "dependencies": {
     "bluebird": "^3.4.6",

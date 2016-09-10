@@ -5,7 +5,7 @@
 </template>
 
 <style lang="sass">
-$headerBorderThickness: 4px;
+$headerBorderThickness: 2px;
 
 header {
     border-bottom: $headerBorderThickness solid black;
