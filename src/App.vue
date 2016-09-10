@@ -1,6 +1,6 @@
 <template>
 <div id="app">
-    <home></home>
+    <home :posts="posts"></home>
 </div>
 </template>
 
@@ -9,6 +9,9 @@ import Home from './layouts/home.vue'
 
 export default {
   name: 'App',
+  data: () => ({
+    posts: window.__posts
+  }),
   components: {
     'home': Home
   }

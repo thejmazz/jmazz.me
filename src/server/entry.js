@@ -9,6 +9,8 @@ import Vue from 'vue'
 import Post from '../layouts/post.vue'
 import Home from '../layouts/home.vue'
 
+import App from '../App.vue'
+
 import marked from '../lib/marked.js'
 
 export default (context) => new Promise((resolve, reject) => {
@@ -55,11 +57,10 @@ export default (context) => new Promise((resolve, reject) => {
         return Promise.resolve(newPosts)
       })
       .then((posts) => {
-        Home.data = () => ({
-          posts
-        })
+        global.window = {}
+        global.window.__posts = posts
 
-        resolve(new Vue(Home))
+        resolve(new Vue(App))
       })
     })
   }
