@@ -2,6 +2,7 @@
 
 const path = require('path')
 const fs = require('fs')
+const Promise = require('bluebird')
 
 const express = require('express')
 
@@ -9,6 +10,7 @@ const {
   postsDir,
   bundleLoc
 } = require('../config.js')
+const marked = require('../lib/marked.js')
 
 // Generate bundleRender from webpack bundle code
 const code = fs.readFileSync(bundleLoc)
@@ -55,6 +57,44 @@ app.get('/blog/:post', (req, res) => {
     post: req.params.post + '.md',
     filepath: path.resolve(__dirname, '../../_posts', req.params.post + '.md')
   }, res)
+})
+
+app.get('/api/allposts', (req, res) => {
+  fs.readdir(postsDir, (err, files) => {
+    Promise.map(files, (file) => new Promise((resolve, reject) => {
+      const fullPost = fs.readFileSync(postsDir + '/' + file, 'utf-8')
+      const preview = fullPost.split('\n').slice(0, 22).join('\n')
+
+      marked({ file: postsDir + '/' + file, summary: true }).then((content) => {
+        resolve({
+          title: file.replace(/\.md$/, ''),
+          attributes: content.attributes,
+          summary: content.body
+        })
+      })
+    }))
+    .then((posts) => {
+      // sort from latest to oldest
+      const dated = {}
+      const newPosts = []
+      posts.forEach((post, i) => {
+        dated[Date.parse(post.attributes.date)] = i
+      })
+      Object.keys(dated).sort().reverse().forEach((key, i) => {
+        newPosts[i] = posts[dated[key]]
+      })
+
+      return Promise.resolve(newPosts)
+    })
+    .then((posts) => {
+      res.send(posts)
+      // Home.data = () => ({
+      //   posts
+      // })
+
+      // resolve(new Vue(Home))
+    })
+  })
 })
 
 app.listen(3001)
