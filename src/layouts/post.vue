@@ -8,12 +8,14 @@
 </template>
 
 <style lang="sass">
-  .post-content {
-    width: 700px;
-    margin: 0 auto;
-  }
+@import "../scss/_hljs-theme.scss";
 
-  /* img { width: 100%; } */
+.post-content {
+width: 700px;
+margin: 0 auto;
+}
+
+/* img { width: 100%; } */
 </style>
 
 <script>

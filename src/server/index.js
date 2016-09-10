@@ -20,6 +20,7 @@ const head = template.slice(0, i)
 const tail = template.slice(i + '{{ APP }}'.length)
 
 const app = express()
+app.use(express.static(path.resolve(__dirname, '../../dist')))
 
 const posts = fs.readdirSync(postsDir)
 
@@ -28,10 +29,9 @@ const postToStream = (context, outStream) => {
 
   outStream.write(head.replace('{{ STYLE }}', `
       <style>
-        ${fs.readFileSync(path.resolve(__dirname, '../css/hljs-theme.css'))}
         ${fs.readFileSync(path.resolve(__dirname, '../css/global.css'))}
-        ${fs.readFileSync(path.resolve(__dirname, '../../dist/styles.css'))}
-      </style>`))
+      </style>
+      <link rel="stylesheet" href="styles.css">`))
 
   renderStream.on('error', (err) => console.log('ERROR: ', err))
   renderStream.on('data', chunk => outStream.write(chunk))
