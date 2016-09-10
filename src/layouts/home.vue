@@ -6,7 +6,7 @@
     </div>
 </template>
 
-<style>
+<style lang="sass">
   .post-content {
     width: 700px;
     margin: 0 auto;

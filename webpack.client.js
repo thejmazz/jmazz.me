@@ -5,7 +5,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 module.exports = {
-  // entry: './src/app.js',
   entry: './src/server/entry.js',
   node: {
     fs: 'empty'
@@ -26,11 +25,14 @@ module.exports = {
   },
   vue: {
     loaders: {
-      css: ExtractTextPlugin.extract('css')
+      sass: ExtractTextPlugin.extract({
+        loader: 'css!sass',
+        fallbackLoader: 'vue-style'
+      })
     }
   },
   plugins: [
-    new HtmlWebpackPlugin(),
+    // new HtmlWebpackPlugin(),
     new ExtractTextPlugin('styles.css')
   ]
 }

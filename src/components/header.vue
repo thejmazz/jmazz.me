@@ -4,9 +4,11 @@
     </header>
 </template>
 
-<style>
+<style lang="sass">
+$headerBorderThickness: 4px;
+
 header {
-    border-bottom: 2px solid black;
+    border-bottom: $headerBorderThickness solid black;
 }
 </style>
 

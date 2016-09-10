@@ -6,7 +6,7 @@
     </ul>
 </template>
 
-<style>
+<style lang="sass">
 .post-list {
     list-style-type: none;
     width: 700px;
