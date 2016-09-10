@@ -1,27 +1,17 @@
 'use strict'
 
-const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
-module.exports = {
-  entry: './src/server/entry.js',
+const base = require('./webpack.base.js')
+
+module.exports = Object.assign({}, base, {
   node: {
     fs: 'empty'
   },
   output: {
     path: 'dist',
     filename: 'bundle.js'
-  },
-  module: {
-    loaders: [{
-      test: /\.vue$/,
-      loader:  'vue'
-    }, {
-      test: /\.js$/,
-      loader: 'babel',
-      include: [path.resolve(__dirname, './src')]
-    }]
   },
   vue: {
     loaders: {
@@ -35,4 +25,4 @@ module.exports = {
     // new HtmlWebpackPlugin(),
     new ExtractTextPlugin('styles.css')
   ]
-}
+})

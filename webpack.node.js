@@ -1,24 +1,13 @@
 'use strict'
 
-const path = require('path')
+const base = require('./webpack.base.js')
 
-module.exports = {
-  entry: './src/server/entry.js',
+module.exports = Object.assign({}, base, {
   output: {
     path: 'dist',
     filename: 'bundle-node.js',
     libraryTarget: 'commonjs2'
   },
   externals: Object.keys(require('./package.json').dependencies),
-  target: 'node',
-  module: {
-    loaders: [{
-      test: /\.vue$/,
-      loader:  'vue'
-    }, {
-      test: /\.js$/,
-      loader: 'babel',
-      include: [path.resolve(__dirname, './src')]
-    }]
-  }
-}
+  target: 'node'
+})
