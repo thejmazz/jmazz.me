@@ -31,7 +31,7 @@ const postToStream = (context, outStream) => {
       <style>
         ${fs.readFileSync(path.resolve(__dirname, '../css/global.css'))}
       </style>
-      <link rel="stylesheet" href="styles.css">`))
+      <link rel="stylesheet" href="/styles.css">`))
 
   renderStream.on('error', (err) => console.log('ERROR: ', err))
   renderStream.on('data', chunk => outStream.write(chunk))
