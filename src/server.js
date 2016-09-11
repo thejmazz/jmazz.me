@@ -61,6 +61,12 @@ window.__INITIAL_STATE__=${JSON.stringify(context.initialState)}
 app.get('/api/allposts', (req, res) => {
   getAllPosts().then(posts => res.send(posts))
 })
+app.get('/api/post/:post', (req, res) => {
+  getPost({ file: path.resolve(postsDir, req.params.post + '.md') })
+    .then(post => res.send(Object.assign(post, {
+      slug: req.params.post
+    })))
+})
 
 app.get('*', (req, res) => {
   res.set('Content-Type', 'text/html')

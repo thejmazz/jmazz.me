@@ -20,6 +20,9 @@ export default (context) => new Promise((resolve, reject) => {
   // set the correct route
   router.push(context.url)
 
+  // do some async data fetching
+  // use "context" passed from renderer as params (e.g. url)
+  // resolve to app's root Vue instance
   Promise.all(router.getMatchedComponents().map((component) => {
     if (component.preFetch) return component.preFetch(store)
   })).then(() => {
@@ -29,32 +32,4 @@ export default (context) => new Promise((resolve, reject) => {
 
     resolve(app)
   })
-
-  // shitty temp global store
-  global.window = {}
-
-  // do some async data fetching
-  // use "context" passed from renderer as params (e.g. url)
-  // resolve to app's root Vue instance
-
-  // for now use properties of context to infer how to hydate "state"
-  // if (context.type === 'home') {
-  //   getAllPosts().then((posts) => {
-  //     window.__INITIAL_STATE__ = {
-  //       posts
-  //     }
-
-  //     resolve(app)
-  //   })
-  // } else if (context.post) {
-  //   getPost({ file: context.filepath }).then((content) => {
-  //     window.__INITIAL_STATE__ = {
-  //       currentPost: content.body
-  //     }
-
-  //     console.log('initial state:', window.__INITIAL_STATE__)
-
-  //     resolve(app)
-  //   })
-  // }
 })

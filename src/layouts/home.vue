@@ -27,6 +27,9 @@ export default {
     }
   },
   preFetch: fetchPosts,
+  beforeMount() {
+    fetchPosts(this.$store)
+  },
   components: {
     'my-header': Header,
     'my-footer': Footer,
