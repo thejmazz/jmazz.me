@@ -11,7 +11,7 @@ import Home from '../layouts/home.vue'
 
 import App from '../App.vue'
 
-import { app, router } from '../app.js'
+import { app, router, store } from '../app.js'
 
 import marked from '../lib/marked.js'
 import { getAllPosts, getPost } from '../lib/posts.js'
@@ -19,6 +19,16 @@ import { getAllPosts, getPost } from '../lib/posts.js'
 export default (context) => new Promise((resolve, reject) => {
   // set the correct route
   router.push(context.url)
+
+  Promise.all(router.getMatchedComponents().map((component) => {
+    if (component.preFetch) return component.preFetch(store)
+  })).then(() => {
+    // console.log('Produced state: ', store.state)
+    console.log('Appending initialState to context')
+    context.initialState = store.state
+
+    resolve(app)
+  })
 
   // shitty temp global store
   global.window = {}
@@ -28,23 +38,23 @@ export default (context) => new Promise((resolve, reject) => {
   // resolve to app's root Vue instance
 
   // for now use properties of context to infer how to hydate "state"
-  if (context.type === 'home') {
-    getAllPosts().then((posts) => {
-      window.__INITIAL_STATE__ = {
-        posts
-      }
+  // if (context.type === 'home') {
+  //   getAllPosts().then((posts) => {
+  //     window.__INITIAL_STATE__ = {
+  //       posts
+  //     }
 
-      resolve(app)
-    })
-  } else if (context.post) {
-    getPost({ file: context.filepath }).then((content) => {
-      window.__INITIAL_STATE__ = {
-        currentPost: content.body
-      }
+  //     resolve(app)
+  //   })
+  // } else if (context.post) {
+  //   getPost({ file: context.filepath }).then((content) => {
+  //     window.__INITIAL_STATE__ = {
+  //       currentPost: content.body
+  //     }
 
-      console.log('initial state:', window.__INITIAL_STATE__)
+  //     console.log('initial state:', window.__INITIAL_STATE__)
 
-      resolve(app)
-    })
-  }
+  //     resolve(app)
+  //   })
+  // }
 })

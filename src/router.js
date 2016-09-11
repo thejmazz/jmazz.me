@@ -12,8 +12,8 @@ export default new Router({
   mode: 'history',
   scrollBehavior: () => ({ y: 0 }),
   routes: [
-    // { path: '*', redirect: '/blog' },
     { path: '/blog', component: Home },
-    { path: '/blog/:post', component: Post }
+    { path: '/blog/:post', component: Post },
+    { path: '*', redirect: '/blog' }
   ]
 })

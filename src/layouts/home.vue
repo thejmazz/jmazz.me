@@ -18,10 +18,15 @@ import Header from '../components/header.vue'
 import Footer from '../components/footer.vue'
 import PostList from './post-list.vue'
 
+const fetchPosts = (store) => store.dispatch('FETCH_HOME_POSTS')
+
 export default {
-  data: () => ({
-    posts: window.__INITIAL_STATE__.posts
-  }),
+  computed: {
+    posts() {
+      return this.$store.state.homeposts
+    }
+  },
+  preFetch: fetchPosts,
   components: {
     'my-header': Header,
     'my-footer': Footer,

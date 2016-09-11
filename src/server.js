@@ -32,12 +32,26 @@ const posts = fs.readdirSync(postsDir)
 const postToStream = (context, outStream) => {
   const renderStream = bundleRenderer.renderToStream(context)
 
+  let firstChunk = true
   outStream.write(head.replace('{{ STYLE }}', '<link rel="stylesheet" href="/styles.css">'))
 
-  outStream.write(`<script>window.__INITIAL_STATE__=${JSON.stringify(initialState)}</script>`)
+  renderStream.on('data', (chunk) => {
+    if (firstChunk && context.initialState) {
+      // console.log('state in context: ', context.initialState)
+      outStream.write(`
+<!-- START: Server initialized state -->
+<script>
+window.__INITIAL_STATE__=${JSON.stringify(context.initialState)}
+</script>
+<!-- END: Server initialized state -->
+
+`)
+      firstChunk = false
+    }
+    outStream.write(chunk)
+  })
 
   renderStream.on('error', (err) => console.log('ERROR: ', err))
-  renderStream.on('data', chunk => outStream.write(chunk))
 
   renderStream.on('end', () => outStream.end(tail))
 
@@ -52,15 +66,11 @@ app.get('*', (req, res) => {
   res.set('Content-Type', 'text/html')
 
   if (req.url === '/blog') {
-    getAllPosts().then(posts => {
-      initialState.posts = posts
+    const context = {
+      url: req.url
+    }
 
-      postToStream({
-        type: 'home',
-        url: req.url,
-        postsDir
-      }, res)
-    })
+    postToStream(context, res)
   } else if (req.url.match(/\/blog\/(\w|-)+$/i)) {
     const postFile = req.url.split('/blog/')[1]
 

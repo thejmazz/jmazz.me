@@ -3,8 +3,9 @@
 require('es6-promise').polyfill()
 require('isomorphic-fetch')
 
-import { app } from '../app.js'
-window.app = app
+import { app, store } from '../app.js'
+
+store.replaceState(window.__INITIAL_STATE__)
 
 // Mount to DOM
 // console.log('Skipping mount')
