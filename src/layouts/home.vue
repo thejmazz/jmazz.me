@@ -19,7 +19,6 @@ import Footer from '../components/footer.vue'
 import PostList from './post-list.vue'
 
 export default {
-  /* props: ['posts'], */
   data: () => ({
     posts: window.__INITIAL_STATE__.posts
   }),

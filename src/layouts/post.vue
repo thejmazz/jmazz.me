@@ -21,6 +21,9 @@ import Header from '../components/header.vue'
 import Footer from '../components/footer.vue'
 
 export default {
+  data: () => ({
+    postContent: window.__INITIAL_STATE__.currentPost
+  }),
   components: {
     'my-header': Header,
     'my-footer': Footer

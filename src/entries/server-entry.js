@@ -14,62 +14,37 @@ import App from '../App.vue'
 import { app, router } from '../app.js'
 
 import marked from '../lib/marked.js'
+import { getAllPosts, getPost } from '../lib/posts.js'
 
 export default (context) => new Promise((resolve, reject) => {
   // set the correct route
-  if (context.url) router.push(context.url)
+  router.push(context.url)
+
+  // shitty temp global store
+  global.window = {}
 
   // do some async data fetching
   // use "context" passed from renderer as params (e.g. url)
   // resolve to app's root Vue instance
 
-  if (context.post) {
-    marked({ file: context.filepath })
-    .then((content) => {
-      Post.data = () => ({
-        postContent: content.body
-      })
-
-      resolve(new Vue(Post))
-    })
-  }
-
+  // for now use properties of context to infer how to hydate "state"
   if (context.type === 'home') {
-    fs.readdir(context.postsDir, (err, files) => {
-      Promise.map(files, (file) => new Promise((resolve, reject) => {
-        const fullPost = fs.readFileSync(context.postsDir + '/' + file, 'utf-8')
-        const preview = fullPost.split('\n').slice(0, 22).join('\n')
+    getAllPosts().then((posts) => {
+      window.__INITIAL_STATE__ = {
+        posts
+      }
 
-        marked({ file: context.postsDir + '/' + file, summary: true }).then((content) => {
-          resolve({
-            title: file.replace(/\.md$/, ''),
-            attributes: content.attributes,
-            summary: content.body
-          })
-        })
-      }))
-      .then((posts) => {
-        // sort from latest to oldest
-        const dated = {}
-        const newPosts = []
-        posts.forEach((post, i) => {
-          dated[Date.parse(post.attributes.date)] = i
-        })
-        Object.keys(dated).sort().reverse().forEach((key, i) => {
-          newPosts[i] = posts[dated[key]]
-        })
+      resolve(app)
+    })
+  } else if (context.post) {
+    getPost({ file: context.filepath }).then((content) => {
+      window.__INITIAL_STATE__ = {
+        currentPost: content.body
+      }
 
-        return Promise.resolve(newPosts)
-      })
-      .then((posts) => {
-        global.window = {}
-        global.window.__INITIAL_STATE__ = {
-          posts
-        }
+      console.log('initial state:', window.__INITIAL_STATE__)
 
-        resolve(app)
-        // resolve(new Vue(App))
-      })
+      resolve(app)
     })
   }
 })

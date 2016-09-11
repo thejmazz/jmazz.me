@@ -9,13 +9,3 @@
 @import "~highlight.js/styles/solarized-light.css";
 @import "globals";
 </style>
-
-<script>
-import Home from './layouts/home.vue'
-
-export default {
-  components: {
-    'home': Home
-  }
-}
-</script>

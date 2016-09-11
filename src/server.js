@@ -2,7 +2,6 @@
 
 const path = require('path')
 const fs = require('fs')
-const Promise = require('bluebird')
 
 const express = require('express')
 
@@ -10,7 +9,7 @@ const {
   postsDir,
   bundleLoc
 } = require('./config.js')
-const marked = require('./lib/marked.js')
+const { getPost, getAllPosts } = require('./lib/posts.js')
 
 // Generate bundleRender from webpack bundle code
 const code = fs.readFileSync(bundleLoc)
@@ -24,7 +23,7 @@ const tail = template.slice(i + '{{ APP }}'.length)
 const app = express()
 app.use(express.static(path.resolve(__dirname, '../dist')))
 
-global.initialState = {
+const initialState = {
   posts: []
 }
 
@@ -44,64 +43,39 @@ const postToStream = (context, outStream) => {
 
   return outStream
 }
-const getAllPosts = () => new Promise((resolve, reject) => {
-  fs.readdir(postsDir, (err, files) => {
-    Promise.map(files, (file) => new Promise((resolve, reject) => {
-      const fullPost = fs.readFileSync(postsDir + '/' + file, 'utf-8')
-      const preview = fullPost.split('\n').slice(0, 22).join('\n')
-
-      marked({ file: postsDir + '/' + file, summary: true }).then((content) => {
-        resolve({
-          title: file.replace(/\.md$/, ''),
-          attributes: content.attributes,
-          summary: content.body
-        })
-      })
-    }))
-    .then((posts) => {
-      // sort from latest to oldest
-      const dated = {}
-      const newPosts = []
-      posts.forEach((post, i) => {
-        dated[Date.parse(post.attributes.date)] = i
-      })
-      Object.keys(dated).sort().reverse().forEach((key, i) => {
-        newPosts[i] = posts[dated[key]]
-      })
-
-      return Promise.resolve(newPosts)
-    })
-    .then((posts) => {
-      resolve(posts)
-    })
-  })
-})
-
-app.get('/blog', (req, res) => {
-  res.set('Content-Type', 'text/html')
-
-  getAllPosts().then(posts => {
-    initialState.posts = posts
-
-    postToStream({
-      type: 'home',
-      url: req.url,
-      postsDir
-    }, res)
-  })
-})
-
-app.get('/blog/:post', (req, res) => {
-  res.set('Content-Type', 'text/html')
-  postToStream({
-    post: req.params.post + '.md',
-    filepath: path.resolve(__dirname, '../_posts', req.params.post + '.md')
-  }, res)
-})
-
 
 app.get('/api/allposts', (req, res) => {
   getAllPosts().then(posts => res.send(posts))
+})
+
+app.get('*', (req, res) => {
+  res.set('Content-Type', 'text/html')
+
+  if (req.url === '/blog') {
+    getAllPosts().then(posts => {
+      initialState.posts = posts
+
+      postToStream({
+        type: 'home',
+        url: req.url,
+        postsDir
+      }, res)
+    })
+  } else if (req.url.match(/\/blog\/(\w|-)+$/i)) {
+    const postFile = req.url.split('/blog/')[1]
+
+    getPost({
+      file: path.resolve(__dirname, '../_posts', postFile + '.md')
+    }).then((currentPost) => {
+      initialState.currentPost = currentPost.body
+
+      postToStream({
+        post: postFile + '.md',
+        url: req.url,
+        filepath: path.resolve(__dirname, '../_posts', postFile + '.md')
+      }, res)
+    })
+  }
 })
 
 app.listen(3001)
