@@ -85,6 +85,7 @@ app.get('/blog', (req, res) => {
 
     postToStream({
       type: 'home',
+      url: req.url,
       postsDir
     }, res)
   })

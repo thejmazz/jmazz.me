@@ -1,6 +1,6 @@
 <template>
 <div id="app">
-    <router-link to="/blog2">Blog</router-link>
+    <router-link to="/blog">Blog</router-link>
     <router-view class="view"></router-view>
 </div>
 </template>
@@ -14,9 +14,6 @@
 import Home from './layouts/home.vue'
 
 export default {
-  data: () => ({
-    posts: window.__INITIAL_STATE__.posts
-  }),
   components: {
     'home': Home
   }

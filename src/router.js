@@ -12,6 +12,6 @@ export default new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: [
     // { path: '*', redirect: '/blog' },
-    { path: '/blog2', component: Home }
+    { path: '/blog', component: Home }
   ]
 })

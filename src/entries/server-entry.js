@@ -11,9 +11,14 @@ import Home from '../layouts/home.vue'
 
 import App from '../App.vue'
 
+import { app, router } from '../app.js'
+
 import marked from '../lib/marked.js'
 
 export default (context) => new Promise((resolve, reject) => {
+  // set the correct route
+  if (context.url) router.push(context.url)
+
   // do some async data fetching
   // use "context" passed from renderer as params (e.g. url)
   // resolve to app's root Vue instance
@@ -62,7 +67,8 @@ export default (context) => new Promise((resolve, reject) => {
           posts
         }
 
-        resolve(new Vue(App))
+        resolve(app)
+        // resolve(new Vue(App))
       })
     })
   }
