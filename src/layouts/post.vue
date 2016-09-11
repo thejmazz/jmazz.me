@@ -38,7 +38,11 @@ export default {
   preFetch: fetchPost.bind(this),
   beforeMount() {
     console.log('doing Post beforeMount')
-    /* this.$data.postContent = 'wheeeee' */
+
+    /* setTimeout(() => { */
+    /*   this.$store.state.posts[this.$route.params.post] = 'wheeeee' */
+    /* }, 1000) */
+
     fetchPost(this.$store, { post: this.$route.params.post })
     .then(() => {
       console.log('finished beforeMount fetch')
