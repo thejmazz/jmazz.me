@@ -4,13 +4,17 @@
 </div>
 </template>
 
+<style lang="sass">
+@import "~highlight.js/styles/solarized-light.css";
+@import "globals";
+</style>
+
 <script>
 import Home from './layouts/home.vue'
 
 export default {
-  name: 'App',
   data: () => ({
-    posts: window.__posts
+    posts: window.__INITIAL_STATE__.posts
   }),
   components: {
     'home': Home

@@ -1,7 +1,6 @@
 'use strict'
 
 const fs = require('fs')
-// import fs from 'fs'
 
 const marked = require('marked')
 const hljs = require('highlight.js')
@@ -9,12 +8,6 @@ const split = require('split2')
 const through = require('through2')
 const eos = require('end-of-stream')
 const yaml = require('js-yaml')
-// import marked from 'marked'
-// import hljs from 'highlight.js'
-// import split from 'split2'
-// import through from 'through2'
-// import eos from 'end-of-stream'
-// import yaml from 'js-yaml'
 
 const mdRenderer = new marked.Renderer()
 mdRenderer.code = (code, lang) => {
@@ -29,15 +22,6 @@ marked.setOptions({
   renderer: mdRenderer
 })
 
-// export const markedAsync = (str) => new Promise((resolve, reject) => {
-//   marked(str, (err, html) => {
-//     if (err) return reject(err)
-
-//     resolve(html)
-//   })
-// })
-
-// export default ({ file, summary = false }) => new Promise((resolve, reject) => {
 module.exports = ({ file, summary = false }) => new Promise((resolve, reject) => {
   let frontMatter = ''
   let markdown = ''

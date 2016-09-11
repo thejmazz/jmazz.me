@@ -19,7 +19,6 @@
 import PostPreview from '../components/post-preview.vue'
 
 export default {
-  name: 'post-list',
   props: [ 'posts' ],
   components: {
     'post-preview': PostPreview

@@ -8,8 +8,6 @@
 </template>
 
 <style lang="sass">
-@import 'hljs-theme';
-
 .post-content {
 width: 700px;
 margin: 0 auto;
@@ -23,8 +21,6 @@ import Header from '../components/header.vue'
 import Footer from '../components/footer.vue'
 
 export default {
-  name: 'Layout-Post',
-  /* props: ['postContent'], */
   components: {
     'my-header': Header,
     'my-footer': Footer

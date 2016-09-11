@@ -14,7 +14,6 @@ header {
 
 <script>
   export default {
-    name: 'Header',
     props: ['content']
   }
 </script>

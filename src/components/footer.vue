@@ -11,9 +11,3 @@ footer {
     text-align: center;
 }
 </style>
-
-<script>
-export default {
-  name: 'my-footer'
-}
-</script>

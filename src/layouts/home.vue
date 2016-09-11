@@ -19,7 +19,6 @@ import Footer from '../components/footer.vue'
 import PostList from './post-list.vue'
 
 export default {
-  name: 'Layout-Post',
   props: ['posts'],
   components: {
     'my-header': Header,

@@ -58,7 +58,9 @@ export default (context) => new Promise((resolve, reject) => {
       })
       .then((posts) => {
         global.window = {}
-        global.window.__posts = posts
+        global.window.__INITIAL_STATE__ = {
+          posts
+        }
 
         resolve(new Vue(App))
       })
