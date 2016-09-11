@@ -1,6 +1,7 @@
 <template>
 <div id="app">
-    <home :posts="posts"></home>
+    <router-link to="/blog2">Blog</router-link>
+    <router-view class="view"></router-view>
 </div>
 </template>
 

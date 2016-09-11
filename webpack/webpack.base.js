@@ -10,8 +10,8 @@ module.exports = {
       loader:  'vue'
     }, {
       test: /\.js$/,
-      loader: 'babel',
-      include: [path.resolve(__dirname, './src')]
+      include: [path.resolve(__dirname, './src')],
+      loader: 'babel'
     }]
   }
 }
