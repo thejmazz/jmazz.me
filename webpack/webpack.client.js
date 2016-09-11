@@ -9,7 +9,7 @@ const base = require('./webpack.base.js')
 
 module.exports = Object.assign({}, base, {
   entry: [
-    path.resolve(__dirname, '../src/entries/client.js')
+    path.resolve(__dirname, '../src/entries/client-entry.js')
   ],
   node: {
     fs: 'empty'

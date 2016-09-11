@@ -9,8 +9,8 @@ const express = require('express')
 const {
   postsDir,
   bundleLoc
-} = require('../config.js')
-const marked = require('../lib/marked.js')
+} = require('./config.js')
+const marked = require('./lib/marked.js')
 
 // Generate bundleRender from webpack bundle code
 const code = fs.readFileSync(bundleLoc)
@@ -22,7 +22,7 @@ const head = template.slice(0, i)
 const tail = template.slice(i + '{{ APP }}'.length)
 
 const app = express()
-app.use(express.static(path.resolve(__dirname, '../../dist')))
+app.use(express.static(path.resolve(__dirname, '../dist')))
 
 global.initialState = {
   posts: []
@@ -94,7 +94,7 @@ app.get('/blog/:post', (req, res) => {
   res.set('Content-Type', 'text/html')
   postToStream({
     post: req.params.post + '.md',
-    filepath: path.resolve(__dirname, '../../_posts', req.params.post + '.md')
+    filepath: path.resolve(__dirname, '../_posts', req.params.post + '.md')
   }, res)
 })
 

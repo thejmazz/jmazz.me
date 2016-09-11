@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "serve": "browser-sync start --server \"dist\" --files \"dist/**\"",
-    "render": "npm run bundle-server && VUE_ENV=server node src/server/render.js",
-    "ssr": "VUE_ENV=server nodemon -w src src/server/index.js",
+    "ssr": "VUE_ENV=server nodemon -w src src/server.js",
     "dev": "node webpack/bundler.js",
     "bundle": "npm run bundle-server && npm run bundle-client",
     "bundle-server": "webpack --config webpack/webpack.node.js",

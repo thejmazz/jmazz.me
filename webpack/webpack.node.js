@@ -6,6 +6,7 @@ const base = require('./webpack.base.js')
 const pkg = require(path.resolve(__dirname, '../package.json'))
 
 module.exports = Object.assign({}, base, {
+  entry: path.resolve(__dirname, '../src/entries/server-entry.js'),
   output: {
     path: 'dist',
     filename: 'bundle-node.js',
