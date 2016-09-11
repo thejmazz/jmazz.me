@@ -2,7 +2,6 @@
 
 const path = require('path')
 
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 const base = require('./webpack.base.js')
@@ -30,7 +29,6 @@ module.exports = Object.assign({}, base, {
     includePaths: [path.resolve(__dirname, '../src/scss')]
   },
   plugins: [
-    // new HtmlWebpackPlugin(),
     new ExtractTextPlugin('styles.css')
   ]
 })
