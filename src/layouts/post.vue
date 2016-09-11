@@ -9,8 +9,9 @@
 
 <style lang="sass">
 .post-content {
-width: 700px;
-margin: 0 auto;
+    width: 700px;
+    margin: 0 auto;
+    flex-grow: 1;
 }
 
 /* img { width: 100%; } */

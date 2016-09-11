@@ -17,4 +17,11 @@
 .fade-enter, .fade-leave-active {
     opacity: 0;
 }
+
+.view {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
 </style>
