@@ -18,8 +18,18 @@
 <script>
 import PostPreview from '../components/post-preview.vue'
 
+const fetchPosts = (store) => store.dispatch('FETCH_HOME_POSTS')
+
 export default {
-  props: [ 'posts' ],
+  computed: {
+    posts() {
+      return this.$store.state.homeposts
+    }
+  },
+  preFetch: fetchPosts,
+  beforeMount() {
+    fetchPosts(this.$store)
+  },
   components: {
     'post-preview': PostPreview
   }

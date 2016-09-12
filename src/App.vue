@@ -11,20 +11,7 @@
 <style lang="sass">
 @import "~highlight.js/styles/solarized-light.css";
 @import "globals";
-
-.fade-enter-active, .fade-leave-active {
-    transition: all 0.2s ease;
-}
-.fade-enter, .fade-leave-active {
-    opacity: 0;
-}
-
-#app {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-}
+@import "transitions";
 </style>
 
 <script>

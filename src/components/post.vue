@@ -1,7 +1,5 @@
 <template>
-
 <div class="post-content" v-html="postContent"></div>
-
 </template>
 
 <style lang="sass">
@@ -11,13 +9,12 @@
     flex-grow: 1;
 }
 
-/* img { width: 100%; } */
+img {
+    max-width: 100%;
+}
 </style>
 
 <script>
-import Header from '../components/header.vue'
-import Footer from '../components/footer.vue'
-
 const fetchPost = (store) => store.dispatch('FETCH_POST', {
   post: store.state.route.params.post
 })
@@ -31,10 +28,6 @@ export default {
   preFetch: fetchPost.bind(this),
   beforeMount() {
     fetchPost(this.$store, { post: this.$route.params.post })
-  },
-  components: {
-    'my-header': Header,
-    'my-footer': Footer
   }
 }
 </script>
