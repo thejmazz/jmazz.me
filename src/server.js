@@ -29,7 +29,7 @@ const initialState = {
 
 const posts = fs.readdirSync(postsDir)
 
-const postToStream = (context, outStream) => {
+const renderToStream = (context, outStream) => {
   const renderStream = bundleRenderer.renderToStream(context)
 
   let firstChunk = true
@@ -71,27 +71,8 @@ app.get('/api/post/:post', (req, res) => {
 app.get('*', (req, res) => {
   res.set('Content-Type', 'text/html')
 
-  if (req.url === '/blog') {
-    const context = {
-      url: req.url
-    }
-
-    postToStream(context, res)
-  } else if (req.url.match(/\/blog\/(\w|-)+$/i)) {
-    const postFile = req.url.split('/blog/')[1]
-
-    getPost({
-      file: path.resolve(__dirname, '../_posts', postFile + '.md')
-    }).then((currentPost) => {
-      initialState.currentPost = currentPost.body
-
-      postToStream({
-        post: postFile + '.md',
-        url: req.url,
-        filepath: path.resolve(__dirname, '../_posts', postFile + '.md')
-      }, res)
-    })
-  }
+  const context = { url: req.url }
+  renderToStream(context, res)
 })
 
 app.listen(3001)

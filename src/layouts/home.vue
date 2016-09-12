@@ -1,17 +1,8 @@
 <template>
-    <div id="app">
-      <my-header content="jmazz/blog"></my-header>
-        <post-list :posts="posts"></post-list>
-      <my-footer />
-    </div>
-</template>
 
-<style lang="sass">
-  .post-content {
-    width: 700px;
-    margin: 0 auto;
-  }
-</style>
+<post-list :posts="posts"></post-list>
+
+</template>
 
 <script>
 import Header from '../components/header.vue'

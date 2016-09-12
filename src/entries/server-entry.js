@@ -1,35 +1,21 @@
 'use strict'
 
-import fs from 'fs'
-import path from 'path'
-
-import Promise from 'bluebird'
-import Vue from 'vue'
-
-import Post from '../layouts/post.vue'
-import Home from '../layouts/home.vue'
-
-import App from '../App.vue'
-
 import { app, router, store } from '../app.js'
 
-import marked from '../lib/marked.js'
-import { getAllPosts, getPost } from '../lib/posts.js'
-
 export default (context) => new Promise((resolve, reject) => {
-  // set the correct route
+  // set the correct route using context passed from request handler
   router.push(context.url)
 
-  // do some async data fetching
-  // use "context" passed from renderer as params (e.g. url)
-  // resolve to app's root Vue instance
+  // run each preFetch from every component in this route
   Promise.all(router.getMatchedComponents().map((component) => {
     if (component.preFetch) return component.preFetch(store)
   })).then(() => {
     // console.log('Produced state: ', store.state)
-    console.log('Appending initialState to context')
+    // console.log('Appending initialState to context')
+    // Request handler will inline serialized state into response
     context.initialState = store.state
 
+    // resolve to app's root Vue instance
     resolve(app)
   })
 })

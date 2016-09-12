@@ -1,10 +1,7 @@
 <template>
-    <div>
-      <my-header content="Post page"></my-header>
-      <div class="post-content" v-html="postContent">
-      </div>
-      <my-footer />
-    </div>
+
+<div class="post-content" v-html="postContent"></div>
+
 </template>
 
 <style lang="sass">

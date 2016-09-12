@@ -4,6 +4,7 @@
     <transition name="fade" mode="out-in">
       <router-view class="view"></router-view>
     </transition>
+    <my-footer></my-footer>
 </div>
 </template>
 
@@ -18,10 +19,20 @@
     opacity: 0;
 }
 
-.view {
+#app {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
 }
 </style>
+
+<script>
+import Footer from './components/footer.vue'
+
+export default {
+  components: {
+    'my-footer': Footer
+  }
+}
+</script>
