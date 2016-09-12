@@ -14,6 +14,7 @@
     "end-of-stream": "^1.1.0",
     "es6-promise": "^3.2.1",
     "express": "^4.14.0",
+    "flexboxgrid": "^6.3.1",
     "highlight.js": "^9.5.0",
     "isomorphic-fetch": "^2.2.1",
     "js-yaml": "^3.6.1",

@@ -5,6 +5,7 @@
 <style lang="sass">
 .post-content {
     width: 700px;
+    max-width: 100%;
     margin: 0 auto;
     flex-grow: 1;
 }
