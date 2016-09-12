@@ -1,0 +1,43 @@
+@import "lumxcolors";
+
+// $primary: #42b983;
+$primary: $indigo-400;
+// $primaryHover: #267B54;
+$primaryHover: darken($primary, 20%);
+$text: #34495e;
+$background: #FFFFFF;
+$background2: lighten(#EEEEEE, 10%);
+$background3: lighten(#DDDDDD, 10%);
+$subtext: #7f8c8d;
+$subtext2: #AAAAAA;
+$subtext2Hover: #888888;
+$link: #2c3e50;
+// $secondary: #e96900;
+$secondary: lighten($text, 10%);
+
+$selectionColor: #FFFFFF;
+$selectionBG: $primary;
+
+$paginatorBorder: #3aa373;
+$paginatorBG: #4fc08d;
+$paginatorHoverBG: #22bd77;
+
+$postFromBG: #E36B6B;
+$postFrom: #FFFFFF;
+
+$tip: #f66;
+$tipBG: #f8f8f8;
+$tipBefore: #fff;
+
+$codeBG: #f8f8f8;
+$highlightBG: #f8f8f8;
+
+$codeBase: #ccc;
+$pre: #525252;
+$codeConstant: #0092db;
+$codeAttribute: #e96900;
+$codeLiteral: #ae81ff;
+$codeTexSpecial: #2973b7;
+$codeTexFormula: #b3b3b3;
+$codeDeletion: #BA4545;
+$codeTitle: #83B917;

@@ -1,18 +1,71 @@
+@import "colors";
+
 html, body {
     height: 100%;
 }
 
 body {
     margin: 0;
+    background-color: $background2;
+    color: $text;
+    font-family: 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+.hljs {
+    padding: 1em;
+}
+
+code {
+    // margin: 0 2px;
+    // padding: 3px 5px;
+    color: $secondary;
+    // border-radius: 2px;
+    white-space: inherit;
+}
+
+::selection {
+    color: $selectionColor;
+    background-color: $selectionBG;
 }
 
 a {
     text-decoration: none;
+    color: $primary;
+
+    &:visited {
+        color: $primary;
+    }
+
+    &:hover {
+        color: $primaryHover;
+    }
 }
 
 h2 {
     margin: 0;
     padding: 20px 0 20px 0;
+}
+
+table {
+    width: 100%;
+    margin: 1em auto;
+    thead {
+        // background-color: $background3;
+        th {
+            padding: 5px;
+            min-width: 80px;
+        }
+    }
+    tbody {
+        tr:nth-child(2n) {
+            background-color: $background3;
+        }
+        td {
+            padding: 5px;
+            vertical-align: text-top;
+        }
+    }
 }
 
 #app {
