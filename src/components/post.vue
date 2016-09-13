@@ -1,5 +1,5 @@
 <template>
-<div class="post-content" v-html="postContent"></div>
+<div class="post-content" :slug="post.slug" v-html="post.body"></div>
 </template>
 
 <style lang="sass">
@@ -22,7 +22,7 @@ const fetchPost = (store) => store.dispatch('FETCH_POST', {
 
 export default {
   computed: {
-    postContent() {
+    post() {
       return this.$store.state.posts[this.$route.params.post]
     }
   },

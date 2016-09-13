@@ -15,8 +15,8 @@ $link: #2c3e50;
 // $secondary: #e96900;
 $secondary: lighten($text, 10%);
 
-$selectionColor: #FFFFFF;
-$selectionBG: $primary;
+$selectionColor: $primaryHover;
+$selectionBG: lighten($primary, 25%);
 
 $paginatorBorder: #3aa373;
 $paginatorBG: #4fc08d;

@@ -30,7 +30,7 @@ const store = new Vuex.Store({
     SET_POST: (state, { post }) => {
       // console.log('SET_POST was called', post)
       // state.posts[post.slug] = post.body
-      Vue.set(state.posts, post.slug, post.body)
+      Vue.set(state.posts, post.slug, post)
     }
   }
 })
