@@ -22,6 +22,7 @@ const tail = template.slice(i + '{{ APP }}'.length)
 
 const app = express()
 app.use(express.static(path.resolve(__dirname, '../dist')))
+app.use('/static', express.static(path.resolve(__dirname, '../static')))
 
 const initialState = {
   posts: []

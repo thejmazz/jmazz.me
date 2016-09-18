@@ -1,5 +1,7 @@
 <template>
-<div class="post-content" :slug="post.slug" v-html="post.body"></div>
+    <transition name="fade" mode="out-in">
+        <div class="post-content" :slug="post.slug" v-html="post.body"></div>
+    </transition>
 </template>
 
 <style lang="sass">
@@ -28,6 +30,7 @@ export default {
   },
   preFetch: fetchPost.bind(this),
   beforeMount() {
+    /* setTimeout(() => fetchPost(this.$store, { post: this.$route.params.post }), 1000) */
     fetchPost(this.$store, { post: this.$route.params.post })
   }
 }

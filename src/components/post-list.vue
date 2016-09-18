@@ -7,11 +7,15 @@
 </template>
 
 <style lang="sass">
+@import "colors";
+
 .post-list {
     list-style-type: none;
     width: 700px;
     margin: 0 auto;
     padding-left: 0;
+    background-color: white;
+    padding: 20px;
 }
 </style>
 

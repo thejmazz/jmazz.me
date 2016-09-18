@@ -13,6 +13,9 @@
 
 <style lang="sass">
 nav {
+    background-color: white;
+    margin-bottom: 80px;
+
     .links {
         display: inline-block;
         float: right;
