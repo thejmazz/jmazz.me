@@ -10,10 +10,24 @@ body {
     color: $text;
     font-family: 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
     overflow-x: hidden;
-    background: url('/static/topology-01.svg');
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-size: cover;
+    // background: url('/static/topology-01.svg');
+    // background-repeat: no-repeat;
+    // background-attachment: fixed;
+    // background-size: cover;
+}
+
+#bg {
+    position: fixed;
+    opacity: 0.3;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -9999;
+
+    img {
+        min-height: 100vh;
+    }
 }
 
 #view {

@@ -1,6 +1,9 @@
 <template>
 <div id="app">
     <navbar></navbar>
+    <div id="bg">
+        <img src="/static/topology-01.svg" />
+    </div>
     <transition name="fade" mode="out-in">
         <div id="view">
         <router-view class="view"></router-view>
