@@ -13,10 +13,9 @@ module.exports = Object.assign({}, base, {
   node: {
     fs: 'empty'
   },
-  output: {
-    path: 'dist',
+  output: Object.assign({}, base.output, {
     filename: 'bundle-client.js'
-  },
+  }),
   vue: {
     loaders: {
       sass: ExtractTextPlugin.extract({

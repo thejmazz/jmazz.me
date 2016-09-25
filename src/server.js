@@ -11,9 +11,7 @@ const {
 } = require('./config.js')
 const { getPost, getAllPosts } = require('./lib/posts.js')
 
-// Generate bundleRender from webpack bundle code
-const code = fs.readFileSync(bundleLoc)
-const bundleRenderer = require('vue-server-renderer').createBundleRenderer(code)
+const { createBundleRenderer } = require('vue-server-renderer')
 
 const template = fs.readFileSync(path.resolve(__dirname, './template.html'), 'utf-8')
 const i = template.indexOf('{{ APP }}')
@@ -24,6 +22,17 @@ const app = express()
 app.use(express.static(path.resolve(__dirname, '../dist')))
 app.use('/static', express.static(path.resolve(__dirname, '../static')))
 
+// Set up bundler for server and client, pass in app for hot reload, take client
+// bundle updates
+let renderer
+require('../webpack/bundler.js')(app, (bundle) => {
+  console.log('Replacing bundle rendererer')
+  renderer = createBundleRenderer(bundle)
+})
+// Generate bundleRender from webpack bundle code
+const code = fs.readFileSync(bundleLoc)
+const premadeBundleRenderer = createBundleRenderer(code)
+
 const initialState = {
   posts: []
 }
@@ -31,7 +40,7 @@ const initialState = {
 const posts = fs.readdirSync(postsDir)
 
 const renderToStream = (context, outStream) => {
-  const renderStream = bundleRenderer.renderToStream(context)
+  const renderStream = renderer.renderToStream(context)
 
   let firstChunk = true
   outStream.write(head.replace('{{ STYLE }}', '<link rel="stylesheet" href="/styles.css">'))
@@ -70,6 +79,8 @@ app.get('/api/post/:post', (req, res) => {
 })
 
 app.get('*', (req, res) => {
+  if (!renderer) res.end('Wait for renderer..')
+
   res.set('Content-Type', 'text/html')
 
   const context = { url: req.url }
