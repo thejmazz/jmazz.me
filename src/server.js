@@ -19,7 +19,7 @@ const head = template.slice(0, i)
 const tail = template.slice(i + '{{ APP }}'.length)
 
 const app = express()
-app.use(express.static(path.resolve(__dirname, '../dist')))
+// app.use(express.static(path.resolve(__dirname, '../dist')))
 app.use('/static', express.static(path.resolve(__dirname, '../static')))
 
 // Set up bundler for server and client, pass in app for hot reload, take client
@@ -30,8 +30,8 @@ require('../webpack/bundler.js')(app, (bundle) => {
   renderer = createBundleRenderer(bundle)
 })
 // Generate bundleRender from webpack bundle code
-const code = fs.readFileSync(bundleLoc)
-const premadeBundleRenderer = createBundleRenderer(code)
+// const code = fs.readFileSync(bundleLoc)
+// const premadeBundleRenderer = createBundleRenderer(code)
 
 const initialState = {
   posts: []
@@ -43,7 +43,8 @@ const renderToStream = (context, outStream) => {
   const renderStream = renderer.renderToStream(context)
 
   let firstChunk = true
-  outStream.write(head.replace('{{ STYLE }}', '<link rel="stylesheet" href="/styles.css">'))
+  // outStream.write(head.replace('{{ STYLE }}', '<link rel="stylesheet" href="/static/styles.css">'))
+  outStream.write(head.replace('{{ STYLE }}', ''))
 
   renderStream.on('data', (chunk) => {
     if (firstChunk && context.initialState) {
@@ -78,7 +79,14 @@ app.get('/api/post/:post', (req, res) => {
     })))
 })
 
-app.get('*', (req, res) => {
+// prefix source map requests with /static so webpack-dev-middleware serves it
+app.get(/^((?!(static)).)*\.map$/, (req, res) => {
+  // console.log('redirect to: ', '/static' + req.url)
+  res.redirect('/static' + req.url)
+})
+
+// anything that does not begin with static gets send to vue renderer
+app.get(/^((?!(static)).)*$/, (req, res) => {
   if (!renderer) res.end('Wait for renderer..')
 
   res.set('Content-Type', 'text/html')

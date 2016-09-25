@@ -16,18 +16,18 @@ module.exports = Object.assign({}, base, {
   output: Object.assign({}, base.output, {
     filename: 'bundle-client.js'
   }),
-  vue: {
-    loaders: {
-      sass: ExtractTextPlugin.extract({
-        loader: 'css!sass',
-        fallbackLoader: 'vue-style'
-      })
-    }
-  },
+  // vue: {
+  //   loaders: {
+  //     sass: ExtractTextPlugin.extract({
+  //       loader: 'css!sass',
+  //       fallbackLoader: 'vue-style'
+  //     })
+  //   }
+  // },
   sassLoader: {
     includePaths: [path.resolve(__dirname, '../src/scss')]
   },
   plugins: [
-    new ExtractTextPlugin('styles.css')
+    // new ExtractTextPlugin('styles.css')
   ]
 })
