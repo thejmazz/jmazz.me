@@ -1,9 +1,14 @@
 <template>
+<div>
+    <navbar />
+    <bg />
     <ul class="post-list">
         <li v-for="post in posts">
-            <post-preview :title="post.title" :summary="post.summary"></post-preview>
+        <post-preview :title="post.title" :summary="post.summary"></post-preview>
         </li>
     </ul>
+    <my-footer />
+</div>
 </template>
 
 <style lang="sass">

@@ -1,7 +1,11 @@
 <template>
-    <transition name="fade" mode="out-in">
-        <div class="post-content" :slug="post.slug" v-html="post.body"></div>
-    </transition>
+    <div>
+        <navbar></navbar>
+        <transition name="fade" mode="out-in">
+            <div class="post-content" :slug="post.slug" v-html="post.body"></div>
+        </transition>
+        <my-footer></my-footer>
+    </div>
 </template>
 
 <style lang="sass">
@@ -13,10 +17,6 @@
     box-shadow: 0 4px 5px 0 rgba(0,0,0,.14),0 1px 10px 0 rgba(0,0,0,.12),0 2px 4px -1px rgba(0,0,0,.2);
     padding: 80px 56px;
     background-color: white;
-}
-
-img {
-    max-width: 100%;
 }
 </style>
 

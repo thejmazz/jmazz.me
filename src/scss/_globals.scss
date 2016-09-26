@@ -16,18 +16,11 @@ body {
     // background-size: cover;
 }
 
-#bg {
-    position: fixed;
-    opacity: 0.3;
-    top: 0;
-    left: 0;
-    width: 100%;
+#app {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     height: 100%;
-    z-index: -9999;
-
-    img {
-        min-height: 100vh;
-    }
 }
 
 #view {
@@ -92,9 +85,3 @@ table {
     }
 }
 
-#app {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-}
