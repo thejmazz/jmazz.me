@@ -1,24 +1,29 @@
 <template>
 <nav>
-    <div class="row">
-        <div class="col-xs-12 col-lg-8 col-lg-offset-2">
-            <div class="links">
-                <router-link to="/blog">Blog</router-link>
-                <a class="external" href="https://twitter.com/thejmazz">@thejmazz</a>
-            </div>
-        </div>
+    <div class="links">
+        <router-link to="/blog">Blog</router-link>
+        <a class="external" href="https://twitter.com/thejmazz" target="_blank">@thejmazz</a>
     </div>
 </nav>
 </template>
 
 <style lang="sass">
+@import "variables";
+
 nav {
     background-color: white;
-    /* margin-bottom: 80px; */
+    margin-top: 40px;
+    /* height: 100%; */
+    box-shadow: $materialShadow;
 
     .links {
         display: inline-block;
         float: right;
+
+        /* &:after { */
+        /*     content: ''; */
+        /*     clear: both; */
+       /* } */
     }
 }
 nav a {

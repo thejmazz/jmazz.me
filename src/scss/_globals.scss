@@ -10,10 +10,6 @@ body {
     color: $text;
     font-family: 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
     overflow-x: hidden;
-    // background: url('/static/topology-01.svg');
-    // background-repeat: no-repeat;
-    // background-attachment: fixed;
-    // background-size: cover;
 }
 
 #app {
@@ -24,9 +20,9 @@ body {
 }
 
 #view {
-    background-color: rgba(255,255,255, 0.9);
-    padding-bottom: 20px;
-    padding-top: 20px;
+    // background-color: rgba(255,255,255, 0.9);
+    // padding-bottom: 20px;
+    // padding-top: 20px;
 }
 
 .hljs {

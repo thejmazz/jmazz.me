@@ -12,11 +12,12 @@
   width: 200%;
   height: 200%;
 
-  opacity: 0.3;
+  background-color: rgba(255,255,255, 1);
   z-index: -9999;
 }
 
 #bg img {
+  opacity: 0.3;
   position: absolute;
   top: 0;
   left: 0;
