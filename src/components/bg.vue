@@ -17,7 +17,7 @@
 }
 
 #bg img {
-  opacity: 0.3;
+  opacity: 0.1;
   position: absolute;
   top: 0;
   left: 0;

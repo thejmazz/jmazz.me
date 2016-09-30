@@ -3,22 +3,23 @@
     <div class="links">
         <router-link to="/blog">Blog</router-link>
         <a class="external" href="https://twitter.com/thejmazz" target="_blank">@thejmazz</a>
+        <div style="clear: both;"></div>
     </div>
 </nav>
 </template>
 
 <style lang="sass">
+@import "colors";
 @import "variables";
 
 nav {
     background-color: white;
-    margin-top: 40px;
-    /* height: 100%; */
+    margin: 40px 0;
     box-shadow: $materialShadow;
 
     .links {
-        display: inline-block;
-        float: right;
+        /* display: inline-block; */
+        /* float: right; */
 
         /* &:after { */
         /*     content: ''; */
@@ -29,11 +30,13 @@ nav {
 nav a {
     text-transform: lowercase;
     float: left;
-    margin: 15px;
+    padding: 15px;
+    transition: all 200ms ease;
 
-    /* &:hover { */
-    /*     text-decoration: underline; */
-    /* } */
+    &:hover {
+        background-color: rgba($primary, 0.5);
+        color: white;
+    }
 
     &::before {
         content: '/';
