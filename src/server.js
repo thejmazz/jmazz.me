@@ -37,8 +37,6 @@ const initialState = {
   posts: []
 }
 
-const posts = fs.readdirSync(postsDir)
-
 const renderToStream = (context, outStream) => {
   const renderStream = renderer.renderToStream(context)
 

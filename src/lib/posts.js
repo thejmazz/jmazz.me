@@ -17,6 +17,8 @@ exports.getAllPosts = () => new Promise((resolve, reject) => {
   fs.readdir(postsDir, (err, files) => {
     if (err) console.error(err)
 
+    files = files.filter(str => str.indexOf('.swp') === -1)
+
     console.log('files: ', files)
     Promise.map(files, (file) => new Promise((resolve, reject) => {
       const fullPost = fs.readFileSync(postsDir + '/' + file, 'utf-8')
