@@ -9,7 +9,10 @@
         <transition name="fade" mode="out-in">
             <div class="row" style="flex-grow: 2;">
                 <div class="col-md-8 col-md-offset-2">
-                    <div class="post-content" :slug="post.slug" v-html="post.body"></div>
+                    <div class="post-content" :slug="post.attributes.slug">
+                        <h1>{{post.attributes.title}}</h1>
+                        <div v-html="post.body"></div>
+                    </div>
                 </div>
             </div>
         </transition>
