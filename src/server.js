@@ -1,37 +1,52 @@
 'use strict'
 
+// TODO how else to manage prod vs dev
+const isProd = process.env.NODE_ENV === 'production'
+
 const path = require('path')
 const fs = require('fs')
 
 const express = require('express')
 
-const {
-  postsDir,
-  bundleLoc
-} = require('./config.js')
+// Used: API requests and bundleRenderer
+const { postsDir, bundleLoc, templateLoc } = require('./config.js')
+// TODO organize markdown post API better
 const { getPost, getAllPosts } = require('./lib/posts.js')
 
 const { createBundleRenderer } = require('vue-server-renderer')
 
-const template = fs.readFileSync(path.resolve(__dirname, './template.html'), 'utf-8')
-const i = template.indexOf('{{ APP }}')
-const head = template.slice(0, i)
-const tail = template.slice(i + '{{ APP }}'.length)
+
+const html = (() => {
+  const template = fs.readFileSync(templateLoc, 'utf8')
+  const i = template.indexOf('{{ APP }}')
+
+  const style = isProd ? '<link rel="stylesheet" href="/static/styles.css">' : ''
+
+  const head = template.slice(0, i)
+    .replace('{{ STYLE }}', style)
+    .replace('{{ TITLE }}', 'jmazz.me')
+  const tail = template.slice(i + '{{ APP }}'.length)
+
+  return { head, tail }
+})()
 
 const app = express()
-// app.use(express.static(path.resolve(__dirname, '../dist')))
+
+// TODO static hosting with caddy. actual perf of express.static? tying static
+// hosting to app is easier to manage?
 app.use('/static', express.static(path.resolve(__dirname, '../static')))
 
-// Set up bundler for server and client, pass in app for hot reload, take client
-// bundle updates
+// Set up bundler for server and client, pass in app for hot reload, take client bundle updates
 let renderer
-require('../webpack/bundler.js')(app, (bundle) => {
-  console.log('Replacing bundle rendererer')
-  renderer = createBundleRenderer(bundle)
-})
-// Generate bundleRender from webpack bundle code
-// const code = fs.readFileSync(bundleLoc)
-// const premadeBundleRenderer = createBundleRenderer(code)
+if (isProd) {
+  const code = fs.readFileSync(bundleLoc)
+  renderer = createBundleRenderer(code)
+} else {
+  require('../webpack/bundler.js')(app, (bundle) => {
+    console.log('Replacing bundle rendererer')
+    renderer = createBundleRenderer(bundle)
+  })
+}
 
 const initialState = {
   posts: []
@@ -41,8 +56,7 @@ const renderToStream = (context, outStream) => {
   const renderStream = renderer.renderToStream(context)
 
   let firstChunk = true
-  // outStream.write(head.replace('{{ STYLE }}', '<link rel="stylesheet" href="/static/styles.css">'))
-  outStream.write(head.replace('{{ STYLE }}', ''))
+  outStream.write(html.head)
 
   renderStream.on('data', (chunk) => {
     if (firstChunk && context.initialState) {
@@ -62,7 +76,7 @@ window.__INITIAL_STATE__=${JSON.stringify(context.initialState)}
 
   renderStream.on('error', (err) => console.log('ERROR: ', err))
 
-  renderStream.on('end', () => outStream.end(tail))
+  renderStream.on('end', () => outStream.end(html.tail))
 
   return outStream
 }
@@ -93,6 +107,8 @@ app.get(/^((?!(static)).)*$/, (req, res) => {
   renderToStream(context, res)
 })
 
+
+// TODO use dotenv
 app.listen(3001)
 console.log('Listening on 3001')
 

@@ -9,8 +9,9 @@
         <transition name="fade" mode="out-in">
             <div class="row" style="flex-grow: 2;">
                 <div class="col-md-8 col-md-offset-2">
-                    <div class="post-content" :slug="post.attributes.slug">
-                        <h1>{{post.attributes.title}}</h1>
+                    <div class="post-content" :slug="post.slug">
+                        <h1>{{post.fm.title}}</h1>
+                        <em>{{date}}</em>
                         <div v-html="post.body"></div>
                     </div>
                 </div>
@@ -41,6 +42,8 @@
 </style>
 
 <script>
+import moment from 'moment'
+
 const fetchPost = (store) => store.dispatch('FETCH_POST', {
   post: store.state.route.params.post
 })
@@ -49,6 +52,10 @@ export default {
   computed: {
     post() {
       return this.$store.state.posts[this.$route.params.post]
+    },
+    date() {
+      const date = this.$store.state.posts[this.$route.params.post].fm.date
+      return moment(date).format('MMMM Do YYYY')
     }
   },
   preFetch: fetchPost.bind(this),

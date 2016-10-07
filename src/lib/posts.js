@@ -27,7 +27,7 @@ exports.getAllPosts = () => new Promise((resolve, reject) => {
       marked({ file: postsDir + '/' + file, summary: true }).then((content) => {
         resolve({
           title: file.replace(/\.md$/, ''),
-          attributes: content.attributes,
+          fm: content.fm,
           summary: content.body
         })
       })
@@ -37,7 +37,7 @@ exports.getAllPosts = () => new Promise((resolve, reject) => {
       const dated = {}
       const newPosts = []
       posts.forEach((post, i) => {
-        dated[Date.parse(post.attributes.date)] = i
+        dated[Date.parse(post.fm.date)] = i
       })
       Object.keys(dated).sort().reverse().forEach((key, i) => {
         newPosts[i] = posts[dated[key]]

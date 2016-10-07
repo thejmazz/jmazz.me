@@ -10,17 +10,6 @@ const MFS = require('memory-fs')
 const nodeConfig = require('./webpack.node.js')
 const clientConfig = require('./webpack.client.js')
 
-// const clientCompiler = webpack(clientConfig)
-// console.log('Started client bundler')
-// clientCompiler.watch({}, (err, stats) => {
-//   if (err) console.error(err)
-
-//   console.log(stats.toString({
-//     chunks: false,
-//     colors: true
-//   }))
-// })
-
 const setupDevServer = (app, onUpdate) => {
   // Modify client config for development use
   clientConfig.entry = [ 'webpack-hot-middleware/client', clientConfig.entry[0] ]

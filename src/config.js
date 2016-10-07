@@ -4,5 +4,6 @@ const path = require('path')
 
 module.exports = {
   postsDir: path.resolve(__dirname, '../_posts'),
-  bundleLoc: path.resolve(__dirname, '../dist/bundle-node.js')
+  bundleLoc: path.resolve(__dirname, '../dist/bundle-node.js'),
+  templateLoc: path.resolve(__dirname, './template.html')
 }

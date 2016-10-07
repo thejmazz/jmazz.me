@@ -57,6 +57,7 @@ module.exports = ({ file, summary = false }) => new Promise((resolve, reject) =>
 
     const attributes = yaml.safeLoad(frontMatter)
 
+    // Use front matter to dicate line length of summary
     if (summary) {
       if (!attributes.summaryLength) attributes.summaryLength = 5
       markdown = markdown.split('\n').slice(0, attributes.summaryLength).join('\n')
@@ -66,7 +67,7 @@ module.exports = ({ file, summary = false }) => new Promise((resolve, reject) =>
       if (err) throw err
 
       resolve({
-        attributes,
+        fm: attributes,
         body: html
       })
     })

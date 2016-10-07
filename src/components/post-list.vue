@@ -9,8 +9,8 @@
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <ul class="post-list">
-                <li v-for="post in posts">
-                <post-preview :title="post.title" :summary="post.summary"></post-preview>
+                <li class="post-list-item" v-for="post in posts">
+                    <post-preview :post="post" :fm="post.fm" :summary="post.summary"></post-preview>
                 </li>
             </ul>
         </div>
@@ -27,10 +27,19 @@
     list-style-type: none;
     /* width: 700px; */
     margin: 0 auto;
-    background-color: white;
-    box-shadow: $materialShadow;
-    border-radius: 2px;
-    padding: $paperPadding;
+    padding: 0;
+    /* background-color: white; */
+    /* box-shadow: $materialShadow; */
+    /* border-radius: 2px; */
+    /* padding: $paperPadding; */
+
+    li.post-list-item {
+        margin-bottom: 56px;
+
+        &:last-child {
+           margin-bottom: 0;
+        }
+    }
 }
 </style>
 
