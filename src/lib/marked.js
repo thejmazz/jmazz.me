@@ -8,6 +8,9 @@ const split = require('split2')
 const through = require('through2')
 const eos = require('end-of-stream')
 const yaml = require('js-yaml')
+const stringToStream = require('string-to-stream')
+const replaceStream = require('replacestream')
+const katex = require('katex')
 
 const mdRenderer = new marked.Renderer()
 mdRenderer.code = (code, lang) => {
@@ -58,6 +61,7 @@ module.exports = ({ file, summary = false }) => new Promise((resolve, reject) =>
     if (err) console.error(err)
 
     const attributes = yaml.safeLoad(frontMatter)
+    const fm = attributes
 
     // Use front matter to dicate line length of summary
     if (summary) {
@@ -68,10 +72,56 @@ module.exports = ({ file, summary = false }) => new Promise((resolve, reject) =>
     marked(markdown, (err, html) => {
       if (err) throw err
 
-      resolve({
-        fm: attributes,
-        body: html
-      })
+      const replaceWithKaTeX = (match, p1, p2, offset, string) => {
+        match = match
+          .replace(/^\$\$\s*/, '')
+          .replace(/\s*\$\$$/, '')
+
+        const html = katex.renderToString(match, { displayMode: true })
+
+        return html
+      }
+
+      const replaceWithKaTeXInline = (match, p1, p2, offset, string) => {
+        // Eject if we match ${, for example from ES6 template literals
+        if (match.match(/\$\{/)) return match
+
+        match = match
+          .replace(/^\s*\$\s*/, '')
+          .replace(/\s*\$$/, '')
+
+        const html = '&nbsp;' + katex.renderToString(match)
+
+        return html
+      }
+
+      if (fm.math) {
+        let postBuffer = ''
+
+        const ks = stringToStream(html)
+          .pipe(replaceStream(/\$\$.+\$\$/g, replaceWithKaTeX))
+          .pipe(replaceStream(/([^\\]\$)([^$]+)\$/g, replaceWithKaTeXInline))
+          .pipe(replaceStream(/\\\$/g, '$'))
+          .pipe(through(function (chunk, enc, next) {
+            postBuffer += chunk.toString()
+            next()
+          }))
+
+        eos(ks, { readable: false }, (err) => {
+          if (err) console.error(err)
+
+          resolve({
+            fm: attributes,
+            body: postBuffer
+          })
+        })
+      } else {
+        console.log('Skipping math')
+        resolve({
+          fm,
+          body: html
+        })
+      }
     })
   })
 })

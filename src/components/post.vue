@@ -37,6 +37,10 @@
   box-shadow: $materialShadow;
   padding: $paperPadding;
   background-color: white;
+
+  // ul, li {
+  //   padding-left: 20px;
+  // }
 }
 </style>
 

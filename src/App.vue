@@ -11,6 +11,7 @@
 <style lang="sass">
 @import "~highlight.js/styles/solarized-light.css";
 @import "~flexboxgrid/dist/flexboxgrid.css";
+@import "~katex/dist/katex.min.css";
 @import "globals";
 @import "transitions";
 </style>

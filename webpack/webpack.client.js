@@ -16,6 +16,12 @@ module.exports = Object.assign({}, base, {
   output: Object.assign({}, base.output, {
     filename: 'bundle-client.js'
   }),
+  module: {
+    loaders: base.module.loaders.concat([{
+      test: /\.(eot|svg|ttf|woff|woff2)$/,
+      loader: 'file'
+    }])
+  },
   // vue: {
   //   loaders: {
   //     sass: ExtractTextPlugin.extract({
