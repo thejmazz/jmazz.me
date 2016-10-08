@@ -38,8 +38,10 @@ module.exports = ({ file, summary = false }) => new Promise((resolve, reject) =>
         seenDashes = true
         return next()
       } else if (line === '---' && seenDashes) {
-        parsingFM = false
-        return next()
+        if (parsingFM) {
+          parsingFM = false
+          return next()
+        }
       }
 
       if (parsingFM) {
