@@ -11,3 +11,9 @@ What is SSR? And why for just a simple blog?
 
 Cause reasons.
 
+Quote example:
+
+> This is mindblowing.
+
+Table xample, headers, italics, bold.
+

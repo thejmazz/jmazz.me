@@ -1,22 +1,22 @@
 <template>
-<div>
+  <div>
     <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <navbar />
-        </div>
+      <div class="col-md-8 col-md-offset-2">
+        <navbar />
+      </div>
     </div>
     <bg />
     <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <ul class="post-list">
-                <li class="post-list-item" v-for="post in posts">
-                    <post-preview :post="post" :fm="post.fm" :summary="post.summary"></post-preview>
-                </li>
-            </ul>
-        </div>
+      <div class="col-md-8 col-md-offset-2">
+        <ul class="post-list">
+          <li class="post-list-item" v-for="post in posts">
+            <post-preview :post="post" :fm="post.fm" :summary="post.summary"></post-preview>
+          </li>
+        </ul>
+      </div>
     </div>
     <my-footer />
-</div>
+  </div>
 </template>
 
 <style lang="sass">
@@ -24,22 +24,17 @@
 @import "variables";
 
 .post-list {
-    list-style-type: none;
-    /* width: 700px; */
-    margin: 0 auto;
-    padding: 0;
-    /* background-color: white; */
-    /* box-shadow: $materialShadow; */
-    /* border-radius: 2px; */
-    /* padding: $paperPadding; */
+  list-style-type: none;
+  margin: 0 auto;
+  padding: 0;
 
-    li.post-list-item {
-        margin-bottom: 56px;
+  li.post-list-item {
+    margin-bottom: 56px;
 
-        &:last-child {
-           margin-bottom: 0;
-        }
+    &:last-child {
+      margin-bottom: 0;
     }
+  }
 }
 </style>
 

@@ -1,7 +1,7 @@
 <template>
-<div id="bg">
+  <div id="bg">
     <img src="/static/topology-01.svg" />
-</div>
+  </div>
 </template>
 
 <style lang="sass">
