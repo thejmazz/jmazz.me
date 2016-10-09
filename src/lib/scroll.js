@@ -34,8 +34,5 @@ exports.enableScroll = (window) => {
   window.onwheel = null
   window.ontouchmove = null
   document.onkeydown = null
-
-  setTimeout(() => window.scrollTo(0, 0))
-  // window.scrollTo(0, 0)
 }
 

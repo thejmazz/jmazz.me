@@ -25,12 +25,13 @@ mdRenderer.paragraph = (text) => {
 mdRenderer.listitem = (text) => `<li>${parseKatex.render(text)}</li>\n`
 mdRenderer.image = function(href, title, text) {
   const id = Math.floor(Math.random() * 10000)
-  let out = `<div id="img-wrapper-${id}" class="img-wrapper"><img id="img-${id}"@click="imageClick" src="${href}" alt="${text}"`
-  if (title) {
-    out += ` title="${title}"`
-  }
-  out += this.options.xhtml ? '/>' : '>'
-  out += '</div>'
+
+  const out = `
+  <figure id="img-wrapper-${id}" class="img-wrapper">
+    <img id="img-${id}" src="${href}" alt="${text}" @click="imageClick" ${title ? `title="${title}"` : ''}>
+    ${title ? `<figcaption>${title}</figcaption>`: ''}
+  </figure>
+  `.trim()
 
   return out
 }

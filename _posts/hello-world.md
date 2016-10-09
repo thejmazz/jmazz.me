@@ -130,9 +130,52 @@ Table:
 
 Images:
 
-(click to view full screen)
+Images are wrapped within a `<figure>` and use a caption if `title` is provided.
 
-![4000 Nodes](/static/nodes_4000_theta_4.png)
+```javascript
+mdRenderer.image = function(href, title, text) {
+  const id = Math.floor(Math.random() * 10000)
+
+  const out = `
+  <figure id="img-wrapper-${id}" class="img-wrapper">
+    <img id="img-${id}" src="${href}" alt="${text}" @click="imageClick" ${title ? `title="${title}"` : ''}>
+    ${title ? `<figcaption>${title}</figcaption>`: ''}
+  </figure>
+  `.trim()
+
+  return out
+}
+```
+
+Unfortunately, highlight.js seems to fail on multiline template literals :(
+
+> Template Literals: Poor Man's JSX &trade;
+
+Note the `@click="imageClick"`. This is a Vue binding. In the post component
+`updated` lifecycle method, a mini app is initialised if we are in the client.
+This little app uses the post content as its template. Since `imageClick` is
+provided in the `methods` property, we can easily hook into the click event.
+
+```javascript
+updated() {
+  if (window) {
+    const postApp = new window.StandaloneVue({
+      el: `#${this.post.slug}`,
+      methods: {
+        imageClick: function({ target }) {
+          // handle image click
+        }
+      }
+    })
+  }
+}
+```
+
+`![alt text](/static/nodes_4000_theta_4.png "4000 Nodes")`
+
+![4000 Nodes](/static/nodes_4000_theta_4.png "Some Nodes")
+
+`![Digital Ocean Toronto](/static/do-toronto.png)`
 
 ![Digital Ocean Toronto](/static/do-toronto.png)
 

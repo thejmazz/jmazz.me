@@ -74,6 +74,16 @@ a {
   }
 }
 
+figure {
+  margin: 0;
+}
+
+figcaption {
+  text-align: center;
+  font-style: italic;
+  color: #777;
+}
+
 .img-wrapper {
   &.active {
     opacity: 1;
