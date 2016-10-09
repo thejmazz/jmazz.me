@@ -54,7 +54,7 @@ marked.setOptions({ renderer: mdRenderer })
 
 ---
 
-Math rendering is provided via [$\KaTeX$][KaTeX] and [parse-katex][parse-katex].
+Math rendering is provided via $\KaTeX$ ([KaTeX][KaTeX]) and [parse-katex][parse-katex].
 All rendering can be ran server-side and the client only needs to include the
 css and fonts.  It is ran over the text in [render
 methods][marked-block-level-render-methods] in the marked renderer. For example:
@@ -83,7 +83,7 @@ Display mode math done using $$ to surround content:
 $$ \int_0^\infty x^3 $$
 
 
-[KaTeX]: https://github.com/Khan/KaTeX
+[KaTeX]: https://khan.github.io/KaTeX/
 [parse-katex]: https://github.com/joshuacaron/parse-katex
 
 ---
@@ -134,7 +134,7 @@ Images:
 
 ![4000 Nodes](/static/nodes_4000_theta_4.png)
 
-![A Gallant Gentleman](/static/a-gallant-gentleman.jpg)
+![Digital Ocean Toronto](/static/do-toronto.png)
 
 ---
 

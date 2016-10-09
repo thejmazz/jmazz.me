@@ -46,7 +46,7 @@
 
 <script>
 import moment from 'moment'
-// import RuntimeVue from 'vue/dist/vue.js'
+import { enableScroll, disableScroll } from '../lib/scroll.js'
 
 const fetchPost = (store) => store.dispatch('FETCH_POST', {
   post: store.state.route.params.post
@@ -69,54 +69,15 @@ export default {
   },
   updated() {
     if (window) {
+      let startScroll
       const postApp = new window.RuntimeVue({
         el: `#${this.post.slug}`,
         methods: {
           imageClick: function({ target }) {
-            // left: 37, up: 38, right: 39, down: 40,
-            // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
-            var keys = {37: 1, 38: 1, 39: 1, 40: 1};
-
-            function preventDefault(e) {
-              e = e || window.event;
-              if (e.preventDefault)
-                e.preventDefault();
-              e.returnValue = false;
-            }
-
-            function preventDefaultForScrollKeys(e) {
-              if (keys[e.keyCode]) {
-                preventDefault(e);
-                return false;
-              }
-            }
-
-            function disableScroll() {
-              if (window.addEventListener) // older FF
-                window.addEventListener('DOMMouseScroll', preventDefault, false);
-              window.onwheel = preventDefault; // modern standard
-              window.onmousewheel = document.onmousewheel = preventDefault; // older browsers, IE
-              window.ontouchmove  = preventDefault; // mobile
-              document.onkeydown  = preventDefaultForScrollKeys;
-            }
-
-            function enableScroll() {
-              if (window.removeEventListener)
-                window.removeEventListener('DOMMouseScroll', preventDefault, false);
-              window.onmousewheel = document.onmousewheel = null;
-              window.onwheel = null;
-              window.ontouchmove = null;
-              document.onkeydown = null;
-            }
+            const { width, height } = target
 
             const id = target.id.split('-')[1]
-
             const wrapper = document.getElementById(`img-wrapper-${id}`)
-            const activateWrapper = () => wrapper.className = 'img-wrapper active'
-            const deactivateWrapper = () => wrapper.className = 'img-wrapper'
-
-            const { width, height } = target
-            // console.log(window.innerHeight, height)
 
             let orientation
             if (width > height && window.innerHeight > height) {
@@ -125,14 +86,26 @@ export default {
               orientation = 'portrait'
             }
 
-            if (target.className === '') {
+            const activate = () => {
+              startScroll = window.scrollY
+
               target.className = `active ${orientation}`
-              disableScroll()
-              activateWrapper()
-            } else if (target.className === `active ${orientation}`) {
+              disableScroll(window)
+              wrapper.className = 'img-wrapper active'
+            }
+
+            const deactivate = () => {
               target.className = ''
-              enableScroll()
-              deactivateWrapper()
+              enableScroll(window)
+              wrapper.className = 'img-wrapper'
+
+              setTimeout(() => window.scrollTo(0, startScroll))
+            }
+
+            if (target.className === '') {
+              activate()
+            } else if (target.className.indexOf('active') !== -1) {
+              deactivate()
             }
           }
         }
