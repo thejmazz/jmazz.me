@@ -2,15 +2,14 @@
 
 const fs = require('fs')
 
+const Promise = require('bluebird')
 const marked = require('marked')
 const hljs = require('highlight.js')
 const split = require('split2')
 const through = require('through2')
-const eos = require('end-of-stream')
+const eos = Promise.promisify(require('end-of-stream'))
 const yaml = require('js-yaml')
-const stringToStream = require('string-to-stream')
-const replaceStream = require('replacestream')
-const katex = require('katex')
+const parseKatex = require('parse-katex')
 
 const mdRenderer = new marked.Renderer()
 mdRenderer.code = (code, lang) => {
@@ -20,6 +19,10 @@ mdRenderer.code = (code, lang) => {
 
   return `<pre><code class="hljs lang-${lang}">${code}</code></pre>`
 }
+mdRenderer.paragraph = (text) => {
+  return '<p>' + parseKatex.render(text) + '</p>\n'
+}
+mdRenderer.listitem = (text) => `<li>${parseKatex.render(text)}</li>\n`
 
 marked.setOptions({
   renderer: mdRenderer
@@ -57,71 +60,24 @@ module.exports = ({ file, summary = false }) => new Promise((resolve, reject) =>
      }
     ))
 
-  eos(ms, { readable: false }, (err) => {
-    if (err) console.error(err)
+  eos(ms, { readable: false })
+    .then(() => {
+      const fm = yaml.safeLoad(frontMatter)
 
-    const attributes = yaml.safeLoad(frontMatter)
-    const fm = attributes
-
-    // Use front matter to dicate line length of summary
-    if (summary) {
-      if (!attributes.summaryLength) attributes.summaryLength = 5
-      markdown = markdown.split('\n').slice(0, attributes.summaryLength).join('\n')
-    }
-
-    marked(markdown, (err, html) => {
-      if (err) throw err
-
-      const replaceWithKaTeX = (match, p1, p2, offset, string) => {
-        match = match
-          .replace(/^\$\$\s*/, '')
-          .replace(/\s*\$\$$/, '')
-
-        const html = katex.renderToString(match, { displayMode: true })
-
-        return html
+      // Use front matter to dicate line length of summary
+      if (summary) {
+        if (!fm.summaryLength) fm.summaryLength = 5
+        markdown = markdown.split('\n').slice(0, fm.summaryLength).join('\n')
       }
 
-      const replaceWithKaTeXInline = (match, p1, p2, offset, string) => {
-        // Eject if we match ${, for example from ES6 template literals
-        if (match.match(/\$\{/)) return match
+      marked(markdown, (err, html) => {
+        if (err) throw err
 
-        match = match
-          .replace(/^\s*\$\s*/, '')
-          .replace(/\s*\$$/, '')
-
-        const html = '&nbsp;' + katex.renderToString(match)
-
-        return html
-      }
-
-      if (fm.math) {
-        let postBuffer = ''
-
-        const ks = stringToStream(html)
-          .pipe(replaceStream(/\$\$.+\$\$/g, replaceWithKaTeX))
-          .pipe(replaceStream(/([^\\]\$)([^$]+)\$/g, replaceWithKaTeXInline))
-          .pipe(replaceStream(/\\\$/g, '$'))
-          .pipe(through(function (chunk, enc, next) {
-            postBuffer += chunk.toString()
-            next()
-          }))
-
-        eos(ks, { readable: false }, (err) => {
-          if (err) console.error(err)
-
-          resolve({
-            fm: attributes,
-            body: postBuffer
-          })
-        })
-      } else {
-        console.log('Skipping math')
         resolve({
           fm,
           body: html
         })
-      }
+      })
     })
-  })
+    .catch(err => console.error(err))
 })

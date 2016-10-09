@@ -23,8 +23,8 @@ console.log('Hello world')
 ```
 
 Due to the way I pass a custom code renderer to [marked][marked], syntax colours
-can be easily swapped by requiring different themes. This was [not as
-simple][hexo-apollo-commit] with [Hexo][hexo].
+can be easily swapped by requiring different themes. <!-- This was [not as
+simple][hexo-apollo-commit] with [Hexo][hexo]. -->
 
 [hexo]: https://hexo.io/
 [hexo-apollo-commit]: https://github.com/thejmazz/hexo-theme-apollo/commit/65dfd4806f02b85fd3200bf516283f5b20925578
@@ -42,9 +42,7 @@ mdRenderer.code = (code, lang) => {
   return `<pre><code class="hljs lang-${lang}">${code}</code></pre>`
 }
 
-marked.setOptions({
-  renderer: mdRenderer
-})
+marked.setOptions({ renderer: mdRenderer })
 ```
 
 ```css
@@ -56,21 +54,37 @@ marked.setOptions({
 
 ---
 
-Quote:
+Math rendering is provided via [$\KaTeX$][KaTeX] and [parse-katex][parse-katex].
+All rendering can be ran server-side and the client only needs to include the
+css and fonts.  It is ran over the text in [render
+methods][marked-block-level-render-methods] in the marked renderer. For example:
 
-> The only difference between a drug and a computer is that one is slightly too
-> large to swallow. ... And our best people are working on that problem, even as
-> we speak.
->
-> -Terence McKenna
+[marked-block-level-render-methods]: https://github.com/chjj/marked#block-level-renderer-methods
 
----
+```javascript
+mdRenderer.listitem = (text) => `<li>${parseKatex.render(text)}</li>\n`
+```
 
-Inline math done using `\$` to surround content; for $n$ in $\mathbb{N}$.
+By omitting the KaTeX parser from code sections, you do not need to worry about
+escaping $ in code blocks. Which is fortunate, because otherwise bash scripts
+would be a nightmare:
 
-Display mode math done using `\$\$` to surround content:
+```bash
+export NODE_PATH="/usr/local/node/bin"
+export PATH="$PATH:$NODE_PATH"
+```
+
+Inline math done using \$ to surround content; `for \$n\$ in \$\mathbb{N}\$` $\rightarrow$ for $n$ in $\mathbb{N}$.
+
+- math looks so $n$ice
+
+Display mode math done using $$ to surround content:
 
 $$ \int_0^\infty x^3 $$
+
+
+[KaTeX]: https://github.com/Khan/KaTeX
+[parse-katex]: https://github.com/joshuacaron/parse-katex
 
 ---
 
@@ -112,5 +126,14 @@ Table:
 | 1 | 10 |
 | 2 | 15 |
 
+---
+
+Quote:
+
+> The only difference between a drug and a computer is that one is slightly too
+> large to swallow. ... And our best people are working on that problem, even as
+> we speak.
+>
+> -Terence McKenna
 
 And there have been `<hr>`s throughout.
