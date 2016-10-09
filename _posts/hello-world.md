@@ -128,6 +128,16 @@ Table:
 
 ---
 
+Images:
+
+(click to view full screen)
+
+![4000 Nodes](/static/nodes_4000_theta_4.png)
+
+![A Gallant Gentleman](/static/a-gallant-gentleman.jpg)
+
+---
+
 Quote:
 
 > The only difference between a drug and a computer is that one is slightly too

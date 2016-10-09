@@ -2,6 +2,8 @@
 
 const path = require('path')
 
+const webpack = require('webpack')
+
 const base = require('./webpack.base.js')
 const pkg = require(path.resolve(__dirname, '../package.json'))
 
@@ -12,5 +14,10 @@ module.exports = Object.assign({}, base, {
     libraryTarget: 'commonjs2'
   }),
   externals: Object.keys(pkg.dependencies),
-  target: 'node'
+  target: 'node',
+  plugins: [
+    new webpack.DefinePlugin({
+      window: false
+    })
+  ]
 })
