@@ -49,6 +49,7 @@ module.exports = ({ file, summary = false }) => new Promise((resolve, reject) =>
 
   console.log('file: ', file)
   const ms = fs.createReadStream(file)
+    .on('error', (err) => console.log('stream error: ', err))
     .pipe(split())
     .pipe(through(function (chunk, enc, next) {
       const line = chunk.toString()
@@ -91,5 +92,7 @@ module.exports = ({ file, summary = false }) => new Promise((resolve, reject) =>
         })
       })
     })
-    .catch(err => console.error(err))
+    .catch(err => {
+      console.log('marked error: ', err)
+    })
 })

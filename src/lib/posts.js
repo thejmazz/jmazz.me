@@ -1,8 +1,8 @@
 'use strict'
 
-const fs = require('fs')
-const path = require('path')
 const Promise = require('bluebird')
+const fs = Promise.promisifyAll(require('fs'))
+const path = require('path')
 
 // const { postsDir } = require('../config.js')
 // const postsDir = path.resolve(__dirname, '../../_posts')A
@@ -51,6 +51,9 @@ exports.getAllPosts = () => new Promise((resolve, reject) => {
   })
 })
 
-exports.getPost = ({ file }) => {
-  return marked({ file })
-}
+exports.getPost = ({ file }) => new Promise((resolve, reject) => {
+  fs.statAsync(file)
+    .then(() => marked({ file }))
+    .then(resolve)
+    .catch(reject)
+})

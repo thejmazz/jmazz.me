@@ -86,9 +86,25 @@ app.get('/api/allposts', (req, res) => {
 })
 app.get('/api/post/:post', (req, res) => {
   getPost({ file: path.resolve(postsDir, req.params.post + '.md') })
-    .then(post => res.send(Object.assign(post, {
-      slug: req.params.post
-    })))
+    .then(post => {
+      post = Object.assign(post, {
+        slug: req.params.post
+      })
+
+      res.send(Object.assign(post, {
+        slug: req.params.post,
+      }))
+    })
+    .catch(err => {
+      res.send({
+        fm: {
+          title: '404',
+          date: new Date().toString()
+        },
+        body: `<p>The post ${req.params.post} does not exist</p>`,
+        slug: req.params.post
+      })
+    })
 })
 
 // prefix source map requests with /static so webpack-dev-middleware serves it
