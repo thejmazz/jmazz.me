@@ -21,7 +21,7 @@ const config = Object.assign({}, base, {
   module: {
     loaders: base.module.loaders.concat([{
       test: /\.(eot|svg|ttf|woff|woff2)$/,
-      loader: 'file'
+      loader: 'url'
     }])
   },
   sassLoader: {
