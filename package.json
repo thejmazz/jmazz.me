@@ -5,6 +5,7 @@
   "scripts": {
     "ssr": "nodemon --legacy-watch -w src src/server.js",
     "start": "NODE_ENV=production node src/server.js",
+    "static": "node webpack/static-builder.js",
     "bundle": "npm run bundle-server && npm run bundle-client",
     "bundle:prod": "NODE_ENV=production npm run bundle",
     "bundle-server": "webpack --config webpack/webpack.node.js",
@@ -16,6 +17,8 @@
     "es6-promise": "^3.2.1",
     "express": "^4.14.0",
     "flexboxgrid": "^6.3.1",
+    "fs-promise": "^0.5.0",
+    "globby": "^6.0.0",
     "highlight.js": "^9.5.0",
     "isomorphic-fetch": "^2.2.1",
     "js-yaml": "^3.6.1",
