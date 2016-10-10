@@ -5,7 +5,7 @@
   "scripts": {
     "ssr": "nodemon --legacy-watch -w src src/server.js",
     "start": "NODE_ENV=production node src/server.js",
-    "static": "node webpack/static-builder.js",
+    "static": "node builder/static-builder.js",
     "bundle": "npm run bundle-server && npm run bundle-client",
     "bundle:prod": "NODE_ENV=production npm run bundle",
     "bundle-server": "webpack --config webpack/webpack.node.js",
