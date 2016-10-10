@@ -1,7 +1,9 @@
 'use strict'
 
 // TODO how else to manage prod vs dev
+process.env.VUE_ENV = 'server'
 const isProd = process.env.NODE_ENV === 'production'
+if (isProd) console.log('Running in production mode')
 
 const path = require('path')
 const fs = require('fs')
@@ -35,6 +37,9 @@ const app = express()
 // TODO static hosting with caddy. actual perf of express.static? tying static
 // hosting to app is easier to manage?
 app.use('/static', express.static(path.resolve(__dirname, '../static')))
+if (isProd) {
+  app.use('/static', express.static(path.resolve(__dirname, '../dist')))
+}
 
 // Set up bundler for server and client, pass in app for hot reload, take client bundle updates
 let renderer

@@ -1,12 +1,14 @@
 'use strict'
 
+const isProd = process.env.NODE_ENV === 'production'
+
 const path = require('path')
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 const base = require('./webpack.base.js')
 
-module.exports = Object.assign({}, base, {
+const config = Object.assign({}, base, {
   entry: [
     path.resolve(__dirname, '../src/entries/client-entry.js')
   ],
@@ -22,18 +24,23 @@ module.exports = Object.assign({}, base, {
       loader: 'file'
     }])
   },
-  // vue: {
-  //   loaders: {
-  //     sass: ExtractTextPlugin.extract({
-  //       loader: 'css!sass',
-  //       fallbackLoader: 'vue-style'
-  //     })
-  //   }
-  // },
   sassLoader: {
     includePaths: [path.resolve(__dirname, '../src/scss')]
-  },
-  plugins: [
-    // new ExtractTextPlugin('styles.css')
-  ]
+  }
 })
+
+if (isProd) {
+  config.vue = {
+    loaders: {
+      sass: ExtractTextPlugin.extract({
+        loader: 'css!sass',
+        fallbackLoader: 'vue-style'
+      })
+    }
+  }
+  config.plugins = [
+    new ExtractTextPlugin('styles.css')
+  ]
+}
+
+module.exports = config

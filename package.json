@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "ssr": "VUE_ENV=server nodemon --legacy-watch -w src src/server.js",
-    "dev": "node webpack/bundler.js",
+    "ssr": "nodemon --legacy-watch -w src src/server.js",
+    "start": "NODE_ENV=production node src/server.js",
     "bundle": "npm run bundle-server && npm run bundle-client",
+    "bundle:prod": "NODE_ENV=production npm run bundle",
     "bundle-server": "webpack --config webpack/webpack.node.js",
     "bundle-client": "webpack --config webpack/webpack.client.js"
   },
