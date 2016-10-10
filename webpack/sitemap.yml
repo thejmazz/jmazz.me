@@ -1,0 +1,6 @@
+pages:
+  - '/blog:/blog/index.html'
+posts:
+  - '/blog/dotfiles-and-friends:/blog/dotfiles-and-friends/index.html'
+  - '/blog/hello-world:/blog/hello-world/index.html'
+  - '/blog/NGS-Workflows:/blog/NGS-Workflows/index.html'
