@@ -82,6 +82,16 @@ figcaption {
   text-align: center;
   font-style: italic;
   color: #777;
+
+  &.active {
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    color: white;
+    background-color: black;
+    z-index: 10000;
+  }
 }
 
 .img-wrapper {
@@ -109,7 +119,7 @@ img {
     right: 0;
     bottom: 0;
     margin: auto;
-    z-index: 10000;
+    // z-index: 10000;
 
     &.landscape {
       max-width: 95%;

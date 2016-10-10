@@ -28,8 +28,8 @@ mdRenderer.image = function(href, title, text) {
 
   const out = `
   <figure id="img-wrapper-${id}" class="img-wrapper">
-    <img id="img-${id}" src="${href}" alt="${text}" @click="imageClick" ${title ? `title="${title}"` : ''}>
-    ${title ? `<figcaption>${title}</figcaption>`: ''}
+    <img id="img-${id}" class="post-image" src="${href}" alt="${text}" @click="imageClick" ${title ? `title="${title}"` : ''}>
+    ${title ? `<figcaption id="img-caption-${id}">${title}</figcaption>`: ''}
   </figure>
   `.trim()
 

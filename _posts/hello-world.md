@@ -171,6 +171,8 @@ updated() {
 }
 ```
 
+As well, you can use arrow keys to move between images.
+
 `![alt text](/static/nodes_4000_theta_4.png "4000 Nodes")`
 
 ![4000 Nodes](/static/nodes_4000_theta_4.png "Some Nodes")

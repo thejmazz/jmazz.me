@@ -2,7 +2,8 @@
 
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
-var keys = { 37: 1, 38: 1, 39: 1, 40: 1 }
+// var keys = { 37: 1, 38: 1, 39: 1, 40: 1 }
+var keys = { 38: 1, 40: 1 }
 
 function preventDefault(e) {
   e = e || window.event
@@ -24,7 +25,8 @@ exports.disableScroll = (window) => {
   window.onwheel = preventDefault; // modern standard
   window.onmousewheel = document.onmousewheel = preventDefault; // older browsers, IE
   window.ontouchmove  = preventDefault; // mobile
-  document.onkeydown  = preventDefaultForScrollKeys
+
+  // document.onkeydown  = preventDefaultForScrollKeys
 }
 
 exports.enableScroll = (window) => {
@@ -33,6 +35,7 @@ exports.enableScroll = (window) => {
   window.onmousewheel = document.onmousewheel = null
   window.onwheel = null
   window.ontouchmove = null
-  document.onkeydown = null
+
+  // document.onkeydown = null
 }
 

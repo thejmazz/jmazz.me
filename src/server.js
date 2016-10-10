@@ -101,7 +101,7 @@ app.get('/api/post/:post', (req, res) => {
           title: '404',
           date: new Date().toString()
         },
-        body: `<p>The post ${req.params.post} does not exist</p>`,
+        body: `<p>The post "${req.params.post}" does not exist.</p>`,
         slug: req.params.post
       })
     })

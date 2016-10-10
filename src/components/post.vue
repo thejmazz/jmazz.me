@@ -70,45 +70,93 @@ export default {
   updated() {
     if (window) {
       let startScroll
+      const baseClass = 'post-image'
+
+      function handleArrows({ keyCode }) {
+        switch (keyCode) {
+          case 39:
+            // Right arrow
+            if (this.activeImage !== -1 && this.activeImage !== this.imageIDs.length-1) this.activeImage++
+            break
+          case 37:
+            // Left arrow
+            if (this.activeImage !== -1 && this.activeImage !== 0) this.activeImage--
+            break
+        }
+      }
+
+      const getImageTogglers = (id) => {
+        const target = document.getElementById(`img-${id}`)
+        const { width, height } = target
+
+        const wrapper = document.getElementById(`img-wrapper-${id}`)
+        const figcaption = document.getElementById(`img-caption-${id}`)
+
+        let orientation
+        if (width > height && window.innerHeight > height) {
+          orientation = 'landscape'
+        } else {
+          orientation = 'portrait'
+        }
+
+        const activate = () => {
+          startScroll = window.scrollY
+
+          target.className = `active ${orientation}`
+          if (figcaption) figcaption.className = 'active'
+            disableScroll(window)
+          wrapper.className = 'img-wrapper active'
+        }
+
+        const deactivate = () => {
+          target.className = baseClass
+          if (figcaption) figcaption.className = ''
+            enableScroll(window)
+          wrapper.className = 'img-wrapper'
+
+          setTimeout(() => window.scrollTo(0, startScroll))
+        }
+
+        return { activate, deactivate }
+      }
+
       const postApp = new window.RuntimeVue({
         el: `#${this.post.slug}`,
+        data: {
+          imageIDs: [].slice.call(document.getElementsByClassName('post-image')).map(img => img.id.split('-')[1]),
+          activeImage: -1
+        },
         methods: {
+          handleArrows,
           imageClick: function({ target }) {
-            const { width, height } = target
-
             const id = target.id.split('-')[1]
-            const wrapper = document.getElementById(`img-wrapper-${id}`)
+            this.activeImage = this.imageIDs.indexOf(id)
 
-            let orientation
-            if (width > height && window.innerHeight > height) {
-              orientation = 'landscape'
-            } else {
-              orientation = 'portrait'
-            }
+            const { activate, deactivate } = getImageTogglers(id)
 
-            const activate = () => {
-              startScroll = window.scrollY
-
-              target.className = `active ${orientation}`
-              disableScroll(window)
-              wrapper.className = 'img-wrapper active'
-            }
-
-            const deactivate = () => {
-              target.className = ''
-              enableScroll(window)
-              wrapper.className = 'img-wrapper'
-
-              setTimeout(() => window.scrollTo(0, startScroll))
-            }
-
-            if (target.className === '') {
+            if (target.className === baseClass) {
               activate()
             } else if (target.className.indexOf('active') !== -1) {
               deactivate()
             }
           }
+        },
+        mounted() {
+          document.onkeydown = this.handleArrows
         }
+      })
+
+      postApp.$watch('activeImage', function (newVal, oldVal) {
+        if (oldVal === -1) {
+          // Eject if it is the first time an image is focused
+          return
+        }
+
+        const { activate } = getImageTogglers(this.imageIDs[newVal])
+        const { deactivate } = getImageTogglers(this.imageIDs[oldVal])
+
+        activate()
+        deactivate()
       })
     }
   }
