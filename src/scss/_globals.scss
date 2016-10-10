@@ -60,6 +60,14 @@ hr {
   border: none;
 }
 
+.clearfix:after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: " ";
+  clear: both;
+  height: 0;
+}
 
 a {
   text-decoration: none;

@@ -1,9 +1,8 @@
 <template>
   <nav>
-    <div class="links">
+    <div class="links clearfix">
       <router-link to="/blog">Blog</router-link>
       <a class="external" href="https://twitter.com/thejmazz" target="_blank">@thejmazz</a>
-      <div style="clear: both;"></div>
     </div>
   </nav>
 </template>
@@ -16,16 +15,6 @@ nav {
   background-color: white;
   margin: 56px 0;
   box-shadow: $materialShadow;
-
-  .links {
-      /* display: inline-block; */
-      /* float: right; */
-
-      /* &:after { */
-      /*     content: ''; */
-      /*     clear: both; */
-     /* } */
-  }
 }
 
 nav a {
