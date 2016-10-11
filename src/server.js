@@ -9,6 +9,7 @@ const path = require('path')
 const fs = require('fs')
 
 const express = require('express')
+const cors = require('cors')
 
 // Used: API requests and bundleRenderer
 const { postsDir, bundleLoc, templateLoc } = require('./config.js')
@@ -33,6 +34,7 @@ const html = (() => {
 })()
 
 const app = express()
+app.use(cors())
 
 // TODO static hosting with caddy. actual perf of express.static? tying static
 // hosting to app is easier to manage?

@@ -1,6 +1,7 @@
 'use strict'
 
 const isProd = process.env.NODE_ENV === 'production'
+const isPrerender = process.env.NODE_ENV === 'prerender'
 
 const path = require('path')
 
@@ -29,7 +30,7 @@ const config = Object.assign({}, base, {
   }
 })
 
-if (isProd) {
+if (isProd || isPrerender) {
   config.vue = {
     loaders: {
       sass: ExtractTextPlugin.extract({
