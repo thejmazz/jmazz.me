@@ -19,12 +19,6 @@ const config = Object.assign({}, base, {
   output: Object.assign({}, base.output, {
     filename: 'bundle-client.js'
   }),
-  module: {
-    loaders: base.module.loaders.concat([{
-      test: /\.(eot|svg|ttf|woff|woff2)$/,
-      loader: 'url'
-    }])
-  },
   sassLoader: {
     includePaths: [path.resolve(__dirname, '../src/scss')]
   }
@@ -42,6 +36,18 @@ if (isProd || isPrerender) {
   config.plugins = [
     new ExtractTextPlugin('styles.css')
   ]
+
+  // Use file loader on prod
+  config.module.loaders = base.module.loaders.concat([{
+    test: /\.(eot|svg|ttf|woff|woff2)$/,
+    loader: 'file?name=/fonts/[hash].[ext]'
+  }])
+} else {
+  // Use url loader in dev (inline base64)
+  config.module.loaders = base.module.loaders.concat([{
+    test: /\.(eot|svg|ttf|woff|woff2)$/,
+    loader: 'url'
+  }])
 }
 
 module.exports = config
