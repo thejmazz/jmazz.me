@@ -128,26 +128,20 @@ Table:
 
 ---
 
-Images:
-
 Images are wrapped within a `<figure>` and use a caption if `title` is provided.
 
-```javascript
-mdRenderer.image = function(href, title, text) {
-  const id = Math.floor(Math.random() * 10000)
+<pre><code class="hljs lang-javascript">mdRenderer.image = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">href, title, text</span>) </span>{
+  <span class="hljs-keyword">const</span> id = <span class="hljs-built_in">Math</span>.floor(<span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">10000</span>)
 
-  const out = `
-  <figure id="img-wrapper-${id}" class="img-wrapper">
-    <img id="img-${id}" src="${href}" alt="${text}" @click="imageClick" ${title ? `title="${title}"` : ''}>
-    ${title ? `<figcaption>${title}</figcaption>`: ''}
-  </figure>
-  `.trim()
+  <span class="hljs-keyword">const</span> out = <span class="hljs-string">`</span>
+  <span class="hljs-string">&lt;figure id="img-wrapper-<span class="hljs-subst">${id}</span>" class="img-wrapper"&gt;</span>
+    <span class="hljs-string">&lt;img id="img-<span class="hljs-subst">${id}</span>" class="post-image" src="<span class="hljs-subst">${href}</span>" alt="<span class="hljs-subst">${text}</span>" @click="imageClick" <span class="hljs-subst">${title ? <span class="hljs-string">`title="</span>${title}<span class="hljs-string">"`</span> : <span class="hljs-string">''</span>}</span>&gt;</span>
+    <span class="hljs-subst">${title ? <span class="hljs-string">`&lt;figcaption id="img-caption-</span>${id}"<span class="hljs-string">&gt;</span>${title}<span class="hljs-string">&lt;/figcaption&gt;`</span>: <span class="hljs-string">''</span>}</span>
+  <span class="hljs-string">&lt;/figure&gt;</span>
+  <span class="hljs-string">`</span>.trim()
 
-  return out
-}
-```
-
-Unfortunately, highlight.js seems to fail on multiline template literals :(
+  <span class="hljs-keyword">return</span> out
+}</code></pre>
 
 > Template Literals: Poor Man's JSX &trade;
 
@@ -175,7 +169,7 @@ As well, you can use arrow keys to move between images.
 
 `![alt text](/static/nodes_4000_theta_4.png "4000 Nodes")`
 
-![4000 Nodes](/static/nodes_4000_theta_4.png "Some Nodes")
+![alt text](/static/nodes_4000_theta_4.png "4000 Nodes")
 
 `![Digital Ocean Toronto](/static/do-toronto.png)`
 

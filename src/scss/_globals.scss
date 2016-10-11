@@ -82,6 +82,16 @@ a {
   }
 }
 
+ol {
+  ol {
+    list-style-type: lower-roman;
+
+    ol {
+        list-style-type: lower-alpha;
+    }
+  }
+}
+
 figure {
   margin: 0;
 }
