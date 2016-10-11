@@ -26,19 +26,18 @@ exports.dumpYaml = (obj) => new Promise((resolve, reject) => {
   }
 })
 
-exports.download = ({ req, dest }) => {
+exports.download = ({ url: req, html: dest }) => {
   const dir = buildDir + path.dirname(dest)
   req = baseURL + req
   dest = buildDir + dest
 
-  return fs.mkdirp(dir)
-    .then(() => {
-      const ws = fs.createWriteStream(dest)
-      http.get(req, res => res.pipe(ws))
+  return fs.mkdirp(dir).then(() => {
+    const ws = fs.createWriteStream(dest)
+    http.get(req, res => res.pipe(ws))
 
-      ws.on('finish', () => console.log(`Downloaded ${req} to ${dest}`))
+    ws.on('finish', () => console.log(`Downloaded ${req} to ${dest}`))
 
-      return eos(ws)
-    })
+    return eos(ws)
+  })
 }
 
