@@ -48,12 +48,20 @@ const staticSource = path.resolve(__dirname, '../static')
 
 const copyStatics = () => fs.copy(staticSource, staticDest)
 
+// === temp while there is no homepage
+
+const makeRoot = () => fs.symlink(
+  './blog/index.html',
+  path.resolve(buildDir, 'index.html')
+)
+
 // === All together now ===
 
 Promise.all([
   build(),
   doWebpack(),
-  copyStatics()
+  copyStatics(),
+  makeRoot()
 ]).then(() => console.log('Static site built'))
   .catch(err => console.error(err))
 

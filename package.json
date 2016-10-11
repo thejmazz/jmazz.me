@@ -9,7 +9,9 @@
     "bundle": "npm run bundle-server && npm run bundle-client",
     "bundle:prod": "NODE_ENV=production npm run bundle",
     "bundle-server": "webpack --config webpack/webpack.node.js",
-    "bundle-client": "webpack --config webpack/webpack.client.js"
+    "bundle-client": "webpack --config webpack/webpack.client.js",
+    "caddy:build": "docker build -t jmazz-caddy . -f ./caddy/Dockerfile",
+    "caddy:run": "docker run --rm -p 8080:8080 jmazz-caddy"
   },
   "dependencies": {
     "bluebird": "^3.4.6",
