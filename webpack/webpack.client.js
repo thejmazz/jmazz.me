@@ -5,6 +5,7 @@ const isPrerender = process.env.NODE_ENV === 'prerender'
 
 const path = require('path')
 
+const webpack = require('webpack')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 const base = require('./webpack.base.js')
@@ -19,22 +20,27 @@ const config = Object.assign({}, base, {
   output: Object.assign({}, base.output, {
     filename: 'bundle-client.js'
   }),
-  sassLoader: {
-    includePaths: [path.resolve(__dirname, '../src/scss')]
-  }
+  // sassLoader: {
+  //   includePaths: [path.resolve(__dirname, '../src/scss')]
+  // }
 })
 
 if (isProd || isPrerender) {
-  config.vue = {
+  const sassPath = [ path.resolve(__dirname, '../src/scss') ]
+
+  const vueConfig = {
     loaders: {
       sass: ExtractTextPlugin.extract({
-        loader: 'css!sass',
+        loader: `css!sass?includePaths=${sassPath}`,
         fallbackLoader: 'vue-style'
       })
     }
   }
   config.plugins = [
-    new ExtractTextPlugin('styles.css')
+    new ExtractTextPlugin('styles.css'),
+    new webpack.LoaderOptionsPlugin({
+      vue: vueConfig
+    })
   ]
 
   // Use file loader on prod
