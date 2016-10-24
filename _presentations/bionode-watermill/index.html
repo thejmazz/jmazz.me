@@ -31,6 +31,8 @@
 
 class: center, middle
 
+<img style="width: 20%;" src="./img/bionode.png"/>
+
 # [bionode-watermill][bionode-watermill]
 
 is a workflow engine for orchestrating **complex** and **dynamic** pipelines.
@@ -43,7 +45,9 @@ streams** which can be used to transform `STDIN` and `STDOUT`. Integration with
 Docker and clustering tools like `qsub` are some immediate objectives of the
 project.
 
-#### October 24, 2016; [@thejmazz][@thejmazz]
+#### [@thejmazz][@thejmazz]
+
+[jmazz.me/pres/2016/10/24/bionode-watermill](jmazz.me/pres/2016/10/24/bionode-watermill)
 
 [bionode-watermill]: https://github.com/bionode/bionode-watermill
 [@thejmazz]: https://twitter.com/thejmazz
@@ -66,6 +70,7 @@ project.
 1. The DAG, input resolution, and operators
 1. NGS Pipeline with watermill
 1. Node streams
+1. Node streams & child processes
 1. Next Steps
 
 [snakemake]: https://bitbucket.org/snakemake/snakemake/wiki/Home
@@ -427,25 +432,84 @@ const pipeline = join(
 
 ---
 
-## Node streams
+## Node [streams](https://nodejs.org/api/stream.html)
 
-- TODO explain why Node having access to Buffer streams is important!
+- lazily produce or consume data in buffered chunks
+- Readable, Writable, Duplex (transform, passthrough)
+- control "highWaterMark", handle backpressure, **Buffers work around V8 heap memory limit**
+- store Buffer by default, can do String or Object streams as well
+- most core Node modules use streams already!
+
+```javascript
+const http = require('http'), fs = require('fs')
+const through = require('through2') // npm install through2
+
+http.createServer((req, res) => {
+  const rs = fs.createReadStream('./alphabet.txt')
+
+  const ts = through(function (chunk, enc, next) { // don't use => syntax (binds this and we lose stream methods)
+    this.push(chunk.toString().toUpperCase()) // call push method from stream
+    next() // call next with no error (could have been next(new Error('something messed up')))
+  })
+
+  // Send uppercase file to response
+  rs.pipe(ts).pipe(res)
+}).listen(8080)
+```
+
+---
+
+## Node streams & child processes
+
+- **play with child process STDIO**
+ - fork `STDOUT` to more than other process
+ - backup each stream in `A | B | C`
+ - transform: `STDOUT | transform | STDIN`
+ - **maintain one container per process, pass `STDIO` between tasks**
+- pass `STDIO` through networks, run analysis across hosts
+- watch `STDOUT`, `STDERR` for keywords, e.g. trigger error for "reference not
+found" (useful for cases where tool does not properly exit with non-zero exit
+code)
+
+```javascript
+const { spawn }  = require('child_process')
+
+// spawn(program, args, options). shell: true does sh -c "bwa mem ref.genomic.fna.gz reads.fastq.gq"
+const bwaMem = spawn('bwa', [ 'mem', ref, reads ], { shell: true })
+const samtoolsView = spawn('samtools', [ 'view', '-bh', '-' ], { shell: true })
+
+// Pass stdout from one process to stdin in another
+bwaMem.stdout.on('data', (data) => samtoolsView.stdin.write(data))
+samtoolsView.stdout.pipe(fs.createWriteStream('./reads.sam'))
+```
+
+- see [ndjson-process-stream](https://github.com/thejmazz/ndjson-process-stream): pass
+newline delimited JSON into child process, child process returns computed
+ndjson, output Objects
 
 ---
 
 ## Next Steps
 
-- Integrate Docker
+- Integrate Docker (something like [go-dexec](https://github.com/ahmetalpbalkan/go-dexec) for `child_process`)
 - Integrate cluster tools like `qsub` (Sun Grid Engine)
 - better metrics (real time, cpu time, network time, etc.)
 - DAG visualization
 - Web/[Electron](http://electron.atom.io/) application (for example, to view plots as they are created)
 - **More examples pipelines!**
 - More accessible custom lifecycle hooks - e.g. custom file validators
+ - integration with [Dat](http://dat-data.com/dat) (e.g., add files to dat after validation)
+- integrate with external storage (e.g. FTP, S3)
 - Organize a tasks submission guideline, so that `npm install watermill-bwa` is
 possible
   - ideally one would then import all their tasks and just write the orchestration code
 - **Grab more contributors! Excite more people and JavaScript about Node!**
+
+---
+
+class: center, middle
+
+# Thanks!
 
 
 
