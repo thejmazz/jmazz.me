@@ -2,6 +2,8 @@
 
 const path = require('path')
 
+const vueConfig = require('./vue-loader.config.js')
+
 module.exports = {
   devtool: 'source-map',
   output: {
@@ -9,9 +11,10 @@ module.exports = {
     publicPath: '/static'
   },
   module: {
-    loaders: [{
+    rules: [{
       test: /\.vue$/,
-      loader:  'vue'
+      loader:  'vue',
+      options: vueConfig
     }, {
       test: /\.js$/,
       include: [path.resolve(__dirname, './src')],
