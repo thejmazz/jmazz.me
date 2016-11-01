@@ -59,7 +59,7 @@ export default {
     },
     date() {
       const date = this.$store.state.posts[this.$route.params.post].fm.date
-      return moment(date).format('MMMM Do YYYY')
+      return moment.utc(date).format('MMMM Do YYYY')
     }
   },
   preFetch: fetchPost.bind(this),
