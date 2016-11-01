@@ -26,7 +26,7 @@ export default {
   props: [ 'summary', 'fm', 'post' ],
   computed: {
     date() {
-      return moment(this.fm.date).format('MMMM Do YYYY')
+      return moment.utc(this.fm.date).format('MMMM Do YYYY')
     }
   }
 }
