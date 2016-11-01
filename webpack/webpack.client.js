@@ -9,6 +9,7 @@ const webpack = require('webpack')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 const base = require('./webpack.base.js')
+const vueConfig = require('./vue-loader.config')
 
 const config = Object.assign({}, base, {
   entry: [
@@ -25,35 +26,53 @@ const config = Object.assign({}, base, {
   // }
 })
 
-if (isProd || isPrerender) {
-  const sassPath = [ path.resolve(__dirname, '../src/scss') ]
+const sassPath = [ path.resolve(__dirname, '../src/scss') ]
 
-  const vueConfig = {
-    loaders: {
-      sass: ExtractTextPlugin.extract({
-        loader: `css!sass?includePaths=${sassPath}`,
-        fallbackLoader: 'vue-style'
-      })
-    }
-  }
-  config.plugins = [
-    new ExtractTextPlugin('styles.css'),
-    new webpack.LoaderOptionsPlugin({
-      vue: vueConfig
+if (isProd || isPrerender) {
+
+  // Set sass loader to extract text
+  vueConfig.loaders = {
+    sass: ExtractTextPlugin.extract({
+      loader: `css!sass?includePaths=${sassPath}`,
+      fallbackLoader: 'vue-style'
     })
-  ]
+  }
+  // and extract
+  config.plugins = config.plugins.concat([
+    new ExtractTextPlugin('styles.css')
+  ])
 
   // Use file loader on prod
-  config.module.loaders = base.module.loaders.concat([{
+  config.module.rules = base.module.rules.concat([{
     test: /\.(eot|svg|ttf|woff|woff2)$/,
     loader: 'file?name=/fonts/[hash].[ext]'
   }])
 } else {
   // Use url loader in dev (inline base64)
-  config.module.loaders = base.module.loaders.concat([{
+  config.module.rules = base.module.rules.concat([{
     test: /\.(eot|svg|ttf|woff|woff2)$/,
     loader: 'url'
   }])
+
+  vueConfig.loaders = {
+    sass: `vue-style!css!sass?includePaths=${sassPath}`
+    // sass: {
+    //   loader: `css!sass?includePaths=${sassPath}`,
+    //   fallbackLoader: 'vue-style'
+    // }
+  }
+
+  // config.plugins = config.plugins.concat(
+  //   new webpack.LoaderOptionsPlugin({
+  //     vue: vueConfig
+  //   })
+  // )
 }
+
+config.plugins = config.plugins.concat(
+  new webpack.DefinePlugin({
+    __VUE_ENV__: JSON.stringify('client')
+  })
+)
 
 module.exports = config

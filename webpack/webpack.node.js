@@ -15,9 +15,10 @@ module.exports = Object.assign({}, base, {
   }),
   externals: Object.keys(pkg.dependencies),
   target: 'node',
-  plugins: [
+  plugins: base.plugins.concat([
     new webpack.DefinePlugin({
-      window: false
+      window: false,
+      __VUE_ENV__: JSON.stringify('server')
     })
-  ]
+  ])
 })

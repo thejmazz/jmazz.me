@@ -4,6 +4,7 @@
 process.env.VUE_ENV = 'server'
 const isProd = process.env.NODE_ENV === 'production'
 if (isProd) console.log('Running in production mode')
+const { SSR_HOST, SSR_PORT } = require('../config.js')
 
 const path = require('path')
 const fs = require('fs')
@@ -17,7 +18,6 @@ const { postsDir, bundleLoc, templateLoc } = require('./config.js')
 const { getPost, getAllPosts } = require('./lib/posts.js')
 
 const { createBundleRenderer } = require('vue-server-renderer')
-
 
 const html = (() => {
   const template = fs.readFileSync(templateLoc, 'utf8')
@@ -39,6 +39,7 @@ app.use(cors())
 // TODO static hosting with caddy. actual perf of express.static? tying static
 // hosting to app is easier to manage?
 app.use('/static', express.static(path.resolve(__dirname, '../static')))
+app.use('/pres', express.static(path.resolve(__dirname, '../_presentations')))
 if (isProd) {
   app.use('/static', express.static(path.resolve(__dirname, '../dist')))
 }
@@ -130,8 +131,7 @@ app.get(/^((?!(static)).)*$/, (req, res) => {
   renderToStream(context, res)
 })
 
+const server = app.listen(SSR_PORT)
 
-// TODO use dotenv
-app.listen(3001)
-console.log('Listening on 3001')
+server.on('listening', () => console.log(`Listening on ${SSR_HOST}:${SSR_PORT}`))
 
