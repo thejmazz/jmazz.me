@@ -14,7 +14,6 @@
     "caddy:run": "docker run --rm -p 8080:8080 jmazz-caddy",
     "container:dev": "docker build -t thejmazz/jmazz.me .",
     "container:prod": "docker build -t thejmazz/jmazz.me --build-arg SSR_HOST=https://jmazz.me .",
-    "container:push": "npm run container:prod && docker push thejmazz/jmazz.me"
   },
   "dependencies": {
     "bluebird": "^3.4.6",

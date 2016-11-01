@@ -69,4 +69,10 @@ if (isProd || isPrerender) {
   // )
 }
 
+config.plugins = config.plugins.concat(
+  new webpack.DefinePlugin({
+    __VUE_ENV__: JSON.stringify('client')
+  })
+)
+
 module.exports = config
