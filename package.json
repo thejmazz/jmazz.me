@@ -16,7 +16,9 @@
   "dependencies": {
     "bluebird": "^3.4.6",
     "cors": "^2.8.1",
+    "dotenv": "^2.0.0",
     "end-of-stream": "^1.1.0",
+    "envalid": "^2.4.0",
     "es6-promise": "^3.2.1",
     "express": "^4.14.0",
     "flexboxgrid": "^6.3.1",
@@ -59,7 +61,7 @@
     "vue-html-loader": "^1.2.3",
     "vue-loader": "^9.7.0",
     "vue-style-loader": "^1.0.0",
-    "webpack": "^2.1.0-beta.22",
+    "webpack": "^2.1.0-beta.25",
     "webpack-dev-middleware": "^1.8.2",
     "webpack-hot-middleware": "^2.12.2"
   }

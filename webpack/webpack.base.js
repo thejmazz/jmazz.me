@@ -2,7 +2,15 @@
 
 const path = require('path')
 
-const vueConfig = require('./vue-loader.config.js')
+const webpack = require('webpack')
+const vueConfig = require('./vue-loader.config')
+
+const { SSR_HOST, SSR_PORT } = require('../config.js')
+
+const definePlugin = new webpack.DefinePlugin({
+  SSR_HOST: JSON.stringify(SSR_HOST),
+  SSR_PORT: JSON.stringify(SSR_PORT)
+})
 
 module.exports = {
   devtool: 'source-map',
@@ -21,5 +29,7 @@ module.exports = {
       loader: 'babel'
     }]
   },
-  plugins: []
+  plugins: [
+    definePlugin
+  ]
 }

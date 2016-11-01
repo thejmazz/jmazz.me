@@ -4,3 +4,4 @@ dist
 build
 *.swp
 npm-debug.log
+.env

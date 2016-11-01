@@ -9,6 +9,7 @@ const webpack = require('webpack')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 const base = require('./webpack.base.js')
+const vueConfig = require('./vue-loader.config')
 
 const config = Object.assign({}, base, {
   entry: [
@@ -24,8 +25,6 @@ const config = Object.assign({}, base, {
   //   includePaths: [path.resolve(__dirname, '../src/scss')]
   // }
 })
-
-const vueConfig = require('./vue-loader.config.js')
 
 const sassPath = [ path.resolve(__dirname, '../src/scss') ]
 

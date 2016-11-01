@@ -4,6 +4,7 @@
 process.env.VUE_ENV = 'server'
 const isProd = process.env.NODE_ENV === 'production'
 if (isProd) console.log('Running in production mode')
+const { SSR_HOST, SSR_PORT } = require('../config.js')
 
 const path = require('path')
 const fs = require('fs')
@@ -17,7 +18,6 @@ const { postsDir, bundleLoc, templateLoc } = require('./config.js')
 const { getPost, getAllPosts } = require('./lib/posts.js')
 
 const { createBundleRenderer } = require('vue-server-renderer')
-
 
 const html = (() => {
   const template = fs.readFileSync(templateLoc, 'utf8')
@@ -130,8 +130,7 @@ app.get(/^((?!(static)).)*$/, (req, res) => {
   renderToStream(context, res)
 })
 
+const server = app.listen(SSR_PORT)
 
-// TODO use dotenv
-app.listen(3001)
-console.log('Listening on 3001')
+server.on('listening', () => console.log(`Listening on ${SSR_HOST}:${SSR_PORT}`))
 

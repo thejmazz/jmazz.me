@@ -5,7 +5,8 @@ import Vuex from 'vuex'
 
 import fetch from 'isomorphic-fetch'
 
-const baseURL = 'https://api.jmazz.me'
+const baseURL = SSR_HOST + ':' + SSR_PORT
+// const baseURL = 'https://api.jmazz.me'
 
 Vue.use(Vuex)
 
