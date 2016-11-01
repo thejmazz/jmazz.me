@@ -39,6 +39,7 @@ app.use(cors())
 // TODO static hosting with caddy. actual perf of express.static? tying static
 // hosting to app is easier to manage?
 app.use('/static', express.static(path.resolve(__dirname, '../static')))
+app.use('/pres', express.static(path.resolve(__dirname, '../_presentations')))
 if (isProd) {
   app.use('/static', express.static(path.resolve(__dirname, '../dist')))
 }

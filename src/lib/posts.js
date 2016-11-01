@@ -5,8 +5,7 @@ const fs = Promise.promisifyAll(require('fs'))
 const path = require('path')
 
 const { postsDir } = require('../config.js')
-// const postsDir = path.resolve(__dirname, '../../_posts')A
-// TODO fix __dirname related paths with render bundle in v8 context
+// TODO? fix __dirname related paths with render bundle in v8 context
 console.log('postsDir: ', postsDir)
 // const postsDir = '/Users/jmazz/Documents/repos/jmazz.me/_posts'
 
