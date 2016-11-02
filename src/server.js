@@ -40,6 +40,7 @@ app.use(cors())
 // hosting to app is easier to manage?
 app.use('/static', express.static(path.resolve(__dirname, '../static')))
 app.use('/pres', express.static(path.resolve(__dirname, '../_presentations')))
+app.use('/codevember', express.static(path.resolve(__dirname, '../_codevember')))
 if (isProd) {
   app.use('/static', express.static(path.resolve(__dirname, '../dist')))
 }
